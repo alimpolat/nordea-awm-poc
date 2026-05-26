@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Architecture — Nordea AWM AI POC — 2026-05-26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+  :root {
+    --ivory: #FAF9F5; --paper: #FFFFFF; --slate: #141413;
+    --clay: #D97757; --clay-bg: rgba(217,119,87,0.10);
+    --oat: #E3DACC;
+    --olive: #788C5D; --olive-bg: rgba(120,140,93,0.12);
+    --rust: #B04A3F; --rust-bg: rgba(176,74,63,0.10);
+    --amber: #C7A35F; --amber-bg: rgba(199,163,95,0.14);
+    --gray-100: #F7F4EC; --gray-150: #F0EEE6; --gray-300: #D1CFC5;
+    --gray-500: #87867F; --gray-700: #3D3D3A;
+    --serif: 'Newsreader', Georgia, "Times New Roman", serif;
+    --mono: 'JetBrains Mono', ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--ivory);color:var(--slate);font-family:var(--serif);font-weight:400;font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;padding:56px 24px 96px;}
+  .sheet{max-width:1080px;margin:0 auto;}
+
+  header.hero{margin-bottom:48px;}
+  .eyebrow{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--clay);margin-bottom:14px;}
+  h1{font-family:var(--serif);font-weight:500;font-size:50px;letter-spacing:-0.015em;line-height:1.08;margin-bottom:18px;}
+  .lead{font-size:18px;line-height:1.65;color:var(--gray-700);max-width:840px;margin-bottom:24px;}
+  .lead strong{color:var(--slate);}
+  .metabar{display:flex;flex-wrap:wrap;gap:0;font-family:var(--mono);font-size:11.5px;color:var(--gray-500);border-top:1px solid var(--gray-300);border-bottom:1px solid var(--gray-300);padding:14px 0;margin-top:8px;}
+  .metabar>div{padding:0 22px 0 0;margin-right:22px;border-right:1px solid var(--gray-300);}
+  .metabar>div:last-child{border-right:none;margin-right:0;padding-right:0;}
+  .metabar strong{color:var(--slate);font-weight:500;}
+
+  section{margin-top:64px;opacity:0;transform:translateY(8px);transition:opacity 600ms ease,transform 600ms ease;}
+  section.visible{opacity:1;transform:translateY(0);}
+  .section-eyebrow{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--clay);margin-bottom:8px;}
+  h2{font-family:var(--serif);font-weight:500;font-size:32px;letter-spacing:-0.01em;line-height:1.2;margin-bottom:16px;}
+  h3{font-family:var(--serif);font-weight:500;font-size:22px;margin:36px 0 12px;color:var(--slate);}
+  p{font-size:17px;line-height:1.65;color:var(--gray-700);margin-bottom:16px;max-width:880px;}
+  p strong{color:var(--slate);}
+  p code,li code,.mono-inline{font-family:var(--mono);font-size:13.5px;background:var(--gray-150);padding:1px 6px;border-radius:3px;color:var(--slate);}
+  ul,ol{margin:12px 0 16px 26px;}
+  ul li,ol li{font-size:17px;line-height:1.6;color:var(--gray-700);margin-bottom:8px;}
+  ul li strong,ol li strong{color:var(--slate);}
+  a{color:var(--clay);text-decoration:none;border-bottom:1px solid transparent;transition:border-color 200ms ease;}
+  a:hover{border-bottom-color:var(--clay);}
+
+  .table-wrap{overflow-x:auto;margin:16px 0;}
+  table{width:100%;border-collapse:collapse;background:var(--paper);border:1.5px solid var(--gray-300);border-radius:14px;overflow:hidden;font-size:14.5px;max-width:1000px;}
+  th,td{text-align:left;padding:11px 15px;border-bottom:1px solid var(--gray-300);vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  th{background:var(--gray-100);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray-500);font-weight:500;}
+  td.mc{font-family:var(--mono);font-size:13px;color:var(--slate);}
+  td.sub{font-size:13.5px;color:var(--gray-700);}
+
+  .diagram{background:var(--paper);border:1.5px solid var(--gray-300);border-radius:14px;padding:26px 22px 16px;margin:22px 0;max-width:1000px;text-align:center;}
+  .diagram svg{max-width:100%;height:auto;display:block;margin:0 auto;}
+  .diagram .caption{font-family:var(--mono);font-size:11px;letter-spacing:0.10em;text-transform:uppercase;color:var(--gray-500);margin-top:14px;}
+
+  @keyframes pulse{0%{transform:scale(1);opacity:0.95;}50%{transform:scale(1.7);opacity:0.2;}100%{transform:scale(1);opacity:0.95;}}
+  .pulse-dot{transform-origin:center;transform-box:fill-box;animation:pulse 2s ease-in-out infinite;}
+
+  .infobox{background:var(--clay-bg);border-left:3px solid var(--clay);padding:16px 22px;margin:18px 0;border-radius:4px;font-size:16px;line-height:1.6;color:var(--gray-700);max-width:1000px;}
+  .infobox strong{color:var(--clay);}
+  .infobox.olive{background:var(--olive-bg);border-left-color:var(--olive);}
+  .infobox.olive strong{color:var(--olive);}
+  .infobox.amber{background:var(--amber-bg);border-left-color:var(--amber);}
+  .infobox.amber strong{color:#8C7038;}
+  .infobox.rust{background:var(--rust-bg);border-left-color:var(--rust);}
+  .infobox.rust strong{color:var(--rust);}
+
+  .pill{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;letter-spacing:0.08em;text-transform:uppercase;}
+  .pill.olive{background:var(--olive-bg);color:var(--olive);}
+  .pill.amber{background:var(--amber-bg);color:#8C7038;}
+  .pill.rust{background:var(--rust-bg);color:var(--rust);}
+  .pill.clay{background:var(--clay-bg);color:var(--clay);}
+  .pill.gray{background:var(--gray-150);color:var(--gray-500);}
+
+  .viz-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:22px 0 8px;max-width:1000px;}
+  .viz-card{background:var(--paper);border:1.5px solid var(--gray-300);border-radius:14px;padding:18px 20px 14px;}
+  .viz-card.full{grid-column:1/-1;}
+  .viz-title{font-family:var(--mono);font-weight:600;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray-700);margin-bottom:3px;}
+  .viz-sub{font-family:var(--serif);font-size:14px;color:var(--gray-500);margin-bottom:8px;line-height:1.4;}
+  .viz-cap{font-family:var(--mono);font-size:11px;color:var(--gray-500);text-align:right;margin-top:4px;max-width:1000px;}
+
+  .agent-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:18px 0;}
+  .agent-card{background:var(--paper);border:1.5px solid var(--gray-300);border-radius:14px;padding:18px 20px;}
+  .agent-card.pro{border-color:var(--clay);}
+  .agent-card .a-stage{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.14em;color:var(--gray-500);margin-bottom:4px;}
+  .agent-card .a-name{font-family:var(--serif);font-weight:500;font-size:18px;color:var(--slate);margin-bottom:8px;}
+  .agent-card .a-model{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;}
+  .agent-card .a-model.pro{background:var(--clay-bg);color:var(--clay);}
+  .agent-card .a-model.flash{background:var(--olive-bg);color:var(--olive);}
+  .agent-card ul{margin:0 0 0 18px;padding:0;}
+  .agent-card ul li{font-size:14px;color:var(--gray-700);margin-bottom:4px;line-height:1.5;}
+  .agent-card .a-output{font-family:var(--mono);font-size:11px;color:var(--amber);margin-top:8px;}
+
+  footer{border-top:1px solid var(--gray-300);margin-top:80px;padding-top:24px;color:var(--gray-500);font-family:var(--mono);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+
+  @media(max-width:720px){
+    body{padding:36px 18px 60px;font-size:16px;}
+    h1{font-size:36px;}h2{font-size:26px;}
+    .viz-grid{grid-template-columns:1fr;}
+    .agent-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<header class="hero">
+  <div class="eyebrow">Architecture · Nordea AWM AI POC · 2026-05-26</div>
+  <h1>System design</h1>
+  <p class="lead">
+    The end-to-end architecture of the <strong>agentic advisor-flow cockpit</strong> — single-container
+    deployment, the five-stage agentic flow that mirrors the AWM mandate, the hybrid retrieval pipeline,
+    model-routing decisions, and the design choices that got us here.
+    Diagrams animate; charts are live — hover anything.
+  </p>
+  <div class="metabar">
+    <div><strong>Container</strong> HF Spaces / Cloud Run europe-west1</div>
+    <div><strong>Models</strong> Vertex AI Gemini 2.5 Pro / Flash</div>
+    <div><strong>Orchestration</strong> LlamaIndex Workflows · 5 stages</div>
+    <div><strong>Vector store</strong> Qdrant embedded + BM25</div>
+  </div>
+</header>
+
+<!-- ── § 1 · SYSTEM MAP ── -->
+<section>
+  <div class="section-eyebrow">§ 1 · System map</div>
+  <h2>Everything, connected in one view</h2>
+  <p>The advisor opens the cockpit; a single container runs the FastAPI app and the LlamaIndex Workflows
+  orchestrator that drives five stage-agents. Those agents call <strong>Vertex AI</strong> for reasoning,
+  the <strong>retrieval engine</strong> for grounded citations, and the
+  <strong>data &amp; intel layer</strong> (static corpus + live World_Monitor) for fresh signals.
+  The brief flows back to the browser, where ECharts and human-in-the-loop controls render it.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 940 430" role="img" aria-label="System map: browser, container with five stage agents, Vertex AI, retrieval engine, data and intel layer">
+      <!-- Browser -->
+      <rect x="360" y="26" width="220" height="58" rx="10" fill="#FFFFFF" stroke="#141413" stroke-width="1.5"/>
+      <text x="470" y="45" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#D97757" letter-spacing="0.1em">CLIENT · BROWSER</text>
+      <text x="470" y="61" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-weight="600" fill="#141413">Advisor cockpit (Anders L.)</text>
+      <text x="470" y="76" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#87867F">React · ECharts · HITL controls</text>
+
+      <!-- Browser <-> Container links -->
+      <line x1="452" y1="84" x2="452" y2="150" stroke="#D97757" stroke-width="1.5"/>
+      <polygon points="448,142 452,150 456,142" fill="#D97757"/>
+      <line x1="488" y1="150" x2="488" y2="84" stroke="#788C5D" stroke-width="1.5"/>
+      <polygon points="484,92 488,84 492,92" fill="#788C5D"/>
+      <text x="548" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#87867F">request ↓ · brief ↑</text>
+      <circle r="4" fill="#D97757"><animateMotion dur="3s" repeatCount="indefinite" path="M452 84 L452 150"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="3s" repeatCount="indefinite"/></circle>
+      <circle r="4" fill="#788C5D"><animateMotion dur="3s" begin="1.5s" repeatCount="indefinite" path="M488 150 L488 84"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="3s" begin="1.5s" repeatCount="indefinite"/></circle>
+
+      <!-- Container -->
+      <rect x="70" y="150" width="800" height="130" rx="12" fill="#FAF9F5" stroke="#D97757" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <text x="86" y="170" font-family="JetBrains Mono, monospace" font-size="9.5" font-weight="600" fill="#D97757" letter-spacing="0.06em">HF SPACES / CLOUD RUN — FastAPI + LlamaIndex Workflows orchestrator</text>
+      <text x="86" y="186" font-family="JetBrains Mono, monospace" font-size="9" fill="#87867F">5-STAGE AGENTIC FLOW</text>
+
+      <!-- spine -->
+      <line x1="130" y1="232" x2="792" y2="232" stroke="#D1CFC5" stroke-width="1.5"/>
+      <circle r="4" fill="#D97757"><animateMotion dur="4.5s" repeatCount="indefinite" path="M130 232 L792 232"/></circle>
+      <circle r="4" fill="#D97757"><animateMotion dur="4.5s" begin="2.25s" repeatCount="indefinite" path="M130 232 L792 232"/></circle>
+
+      <!-- Stage chips -->
+      <rect x="100" y="212" width="124" height="40" rx="8" fill="#FFFFFF" stroke="#141413" stroke-width="1.3"/>
+      <text x="162" y="236" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#141413">1 · Scout</text>
+      <rect x="240" y="212" width="124" height="40" rx="8" fill="#FFFFFF" stroke="#141413" stroke-width="1.3"/>
+      <text x="302" y="236" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#141413">2 · Insights</text>
+      <rect x="380" y="212" width="124" height="40" rx="8" fill="rgba(217,119,87,0.10)" stroke="#D97757" stroke-width="1.8"/>
+      <text x="442" y="236" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#B04A3F">3 · Planner ▸</text>
+      <rect x="520" y="212" width="124" height="40" rx="8" fill="rgba(217,119,87,0.10)" stroke="#D97757" stroke-width="1.8"/>
+      <text x="582" y="236" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#B04A3F">4 · Synth</text>
+      <rect x="660" y="212" width="124" height="40" rx="8" fill="#FFFFFF" stroke="#788C5D" stroke-width="1.3" stroke-dasharray="4,3"/>
+      <text x="722" y="236" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#788C5D">5 · Follow-up</text>
+
+      <!-- Container <-> bottom layer links -->
+      <line x1="182" y1="280" x2="182" y2="320" stroke="#87867F" stroke-width="1.4"/>
+      <polygon points="178,312 182,320 186,312" fill="#87867F"/>
+      <line x1="198" y1="320" x2="198" y2="280" stroke="#87867F" stroke-width="1.4"/>
+      <polygon points="194,288 198,280 202,288" fill="#87867F"/>
+      <circle r="3.5" fill="#D97757"><animateMotion dur="2.6s" repeatCount="indefinite" path="M182 280 L182 320"/></circle>
+      <line x1="462" y1="280" x2="462" y2="320" stroke="#87867F" stroke-width="1.4"/>
+      <polygon points="458,312 462,320 466,312" fill="#87867F"/>
+      <line x1="478" y1="320" x2="478" y2="280" stroke="#87867F" stroke-width="1.4"/>
+      <polygon points="474,288 478,280 482,288" fill="#87867F"/>
+      <circle r="3.5" fill="#D97757"><animateMotion dur="2.6s" begin="0.9s" repeatCount="indefinite" path="M462 280 L462 320"/></circle>
+      <line x1="742" y1="280" x2="742" y2="320" stroke="#87867F" stroke-width="1.4"/>
+      <polygon points="738,312 742,320 746,312" fill="#87867F"/>
+      <line x1="758" y1="320" x2="758" y2="280" stroke="#87867F" stroke-width="1.4"/>
+      <polygon points="754,288 758,280 762,288" fill="#87867F"/>
+      <circle r="3.5" fill="#D97757"><animateMotion dur="2.6s" begin="1.7s" repeatCount="indefinite" path="M742 280 L742 320"/></circle>
+
+      <!-- Bottom layer -->
+      <rect x="70" y="320" width="240" height="86" rx="10" fill="#FFFFFF" stroke="#C7A35F" stroke-width="1.5"/>
+      <text x="190" y="342" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#8C7038" letter-spacing="0.08em">VERTEX AI · us-central1</text>
+      <text x="190" y="361" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-weight="600" fill="#141413">Gemini 2.5 Pro · Flash</text>
+      <text x="190" y="378" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#87867F">gemini-embedding-001 @768d</text>
+      <text x="190" y="394" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#87867F">reasoning · embeddings</text>
+
+      <rect x="350" y="320" width="240" height="86" rx="10" fill="#FFFFFF" stroke="#141413" stroke-width="1.5"/>
+      <text x="470" y="342" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#141413" letter-spacing="0.08em">RETRIEVAL ENGINE</text>
+      <text x="470" y="361" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-weight="600" fill="#141413">Qdrant · BM25 · RRF</text>
+      <text x="470" y="378" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#87867F">Contextual Retrieval + Flash reranker</text>
+      <text x="470" y="394" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#87867F">grounded top-5 + citations</text>
+
+      <rect x="630" y="320" width="240" height="86" rx="10" fill="#FFFFFF" stroke="#788C5D" stroke-width="1.5"/>
+      <text x="750" y="342" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#788C5D" letter-spacing="0.08em">DATA &amp; INTEL</text>
+      <text x="750" y="361" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-weight="600" fill="#141413">Corpus · Bergström fixtures</text>
+      <text x="750" y="378" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="#87867F">World_Monitor · live / snapshot</text>
+      <circle cx="700" cy="356" r="4" fill="#788C5D" class="pulse-dot"/>
+
+      <!-- Retrieval <-> Data horizontal link -->
+      <line x1="590" y1="363" x2="630" y2="363" stroke="#87867F" stroke-width="1.4" stroke-dasharray="3,2"/>
+      <polygon points="622,359 630,363 622,367" fill="#87867F"/>
+    </svg>
+    <div class="caption">clay = request / LLM call · olive = response / live signal · ◌ pulse = World_Monitor live feed</div>
+  </div>
+
+  <div class="infobox"><strong>Single-container design.</strong> Everything except Vertex AI and World_Monitor
+  runs in one container — Qdrant is embedded in-process (read-only after the index build), BM25 lives in
+  memory. No sidecars, no managed vector DB, no extra spend. Cold start is ~3–5 s; the brief is cached
+  so the advisor sees it instantly while the container regenerates in the background.</div>
+</section>
+
+<!-- ── § 2 · FIVE-STAGE FLOW ── -->
+<section>
+  <div class="section-eyebrow">§ 2 · The five-stage agentic flow</div>
+  <h2>The advisor flow, end-to-end</h2>
+  <p>This diagram answers the JD directly: <strong>"enabling the private banking advisor flow end-to-end —
+  from opportunity identification and client insights to meeting preparation, recommendations, and
+  follow-up."</strong> Each stage is an agent with a typed Pydantic output contract; Stage 3 fans out
+  to four specialists that run concurrently via <code>asyncio.gather</code>, then a Synthesizer
+  assembles the brief. The loop closes when captured follow-ups become next week's opportunity signals.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 940 545" role="img" aria-label="Five-stage agentic flow: Opportunity-Scout, Client-Insights, Planner fanning out to four parallel specialists, Synthesizer, Brief, Follow-up feedback loop">
+      <!-- Stage 1 -->
+      <rect x="70" y="44" width="180" height="56" rx="10" fill="#FFFFFF" stroke="#141413" stroke-width="1.5"/>
+      <text x="160" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#D97757" letter-spacing="0.06em">STAGE 1 · FLASH</text>
+      <text x="160" y="83" text-anchor="middle" font-family="Newsreader, serif" font-size="12.5" font-weight="600" fill="#141413">Opportunity-Scout</text>
+      <text x="160" y="118" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#87867F">OPPORTUNITY IDENTIFICATION</text>
+      <!-- Stage 2 -->
+      <rect x="300" y="44" width="180" height="56" rx="10" fill="#FFFFFF" stroke="#141413" stroke-width="1.5"/>
+      <text x="390" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#D97757" letter-spacing="0.06em">STAGE 2 · FLASH</text>
+      <text x="390" y="83" text-anchor="middle" font-family="Newsreader, serif" font-size="12.5" font-weight="600" fill="#141413">Client-Insights</text>
+      <text x="390" y="118" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#87867F">CLIENT INSIGHTS</text>
+      <!-- S1 -> S2 arrow -->
+      <line x1="250" y1="72" x2="300" y2="72" stroke="#87867F" stroke-width="1.5"/>
+      <polygon points="292,68 300,72 292,76" fill="#87867F"/>
+      <circle r="4" fill="#D97757"><animateMotion dur="5s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.1;0.25;1" calcMode="linear" path="M250 72 L300 72"/></circle>
+
+      <!-- Planner (Stage 3a — Pro) -->
+      <rect x="380" y="152" width="200" height="52" rx="10" fill="rgba(217,119,87,0.10)" stroke="#D97757" stroke-width="1.8"/>
+      <text x="480" y="172" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#B04A3F" letter-spacing="0.06em">STAGE 3a · PRO</text>
+      <text x="480" y="190" text-anchor="middle" font-family="Newsreader, serif" font-size="12.5" font-weight="600" fill="#141413">Planner</text>
+      <!-- S2 -> Planner -->
+      <line x1="390" y1="100" x2="455" y2="152" stroke="#87867F" stroke-width="1.5"/>
+      <polygon points="449,144 455,152 446,150" fill="#87867F"/>
+
+      <!-- parallel specialists band label -->
+      <text x="864" y="246" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="600" fill="#87867F" letter-spacing="0.06em">MEETING PREPARATION · PARALLEL RESEARCH</text>
+
+      <!-- Specialists (3b–3e) -->
+      <rect x="60" y="252" width="180" height="58" rx="10" fill="#FFFFFF" stroke="#141413" stroke-width="1.4"/>
+      <text x="150" y="272" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="600" fill="#788C5D">STAGE 3b · FLASH</text>
+      <text x="150" y="289" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-weight="600" fill="#141413">Intel-Gathering</text>
+      <text x="150" y="304" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#87867F">World_Monitor signals</text>
+
+      <rect x="268" y="252" width="180" height="58" rx="10" fill="#FFFFFF" stroke="#141413" stroke-width="1.4"/>
+      <text x="358" y="272" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="600" fill="#788C5D">STAGE 3c · FLASH</text>
+      <text x="358" y="289" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-weight="600" fill="#141413">Macro-RAG</text>
+      <text x="358" y="304" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#87867F">RAG · IMF/ECB/BIS</text>
+
+      <rect x="476" y="252" width="180" height="58" rx="10" fill="#FFFFFF" stroke="#141413" stroke-width="1.4"/>
+      <text x="566" y="272" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="600" fill="#788C5D">STAGE 3d · FLASH</text>
+      <text x="566" y="289" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-weight="600" fill="#141413">Portfolio</text>
+      <text x="566" y="304" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#87867F">RAG + compute math</text>
+
+      <rect x="684" y="252" width="180" height="58" rx="10" fill="#FFFFFF" stroke="#141413" stroke-width="1.4"/>
+      <text x="774" y="272" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="600" fill="#788C5D">STAGE 3e · FLASH</text>
+      <text x="774" y="289" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-weight="600" fill="#141413">News</text>
+      <text x="774" y="304" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#87867F">Vertex Search grounding</text>
+
+      <!-- Fan-out Planner -> Specialists -->
+      <line x1="480" y1="204" x2="150" y2="252" stroke="#87867F" stroke-width="1.3"/>
+      <line x1="480" y1="204" x2="358" y2="252" stroke="#87867F" stroke-width="1.3"/>
+      <line x1="480" y1="204" x2="566" y2="252" stroke="#87867F" stroke-width="1.3"/>
+      <line x1="480" y1="204" x2="774" y2="252" stroke="#87867F" stroke-width="1.3"/>
+      <circle r="4" fill="#D97757"><animateMotion dur="3.4s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.45;0.7;1" calcMode="linear" path="M480 204 L150 252"/></circle>
+      <circle r="4" fill="#D97757"><animateMotion dur="3.4s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.45;0.7;1" calcMode="linear" path="M480 204 L358 252"/></circle>
+      <circle r="4" fill="#D97757"><animateMotion dur="3.4s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.45;0.7;1" calcMode="linear" path="M480 204 L566 252"/></circle>
+      <circle r="4" fill="#D97757"><animateMotion dur="3.4s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.45;0.7;1" calcMode="linear" path="M480 204 L774 252"/></circle>
+
+      <!-- Fan-in Specialists -> Synthesizer -->
+      <line x1="150" y1="310" x2="480" y2="360" stroke="#87867F" stroke-width="1.3"/>
+      <line x1="358" y1="310" x2="480" y2="360" stroke="#87867F" stroke-width="1.3"/>
+      <line x1="566" y1="310" x2="480" y2="360" stroke="#87867F" stroke-width="1.3"/>
+      <line x1="774" y1="310" x2="480" y2="360" stroke="#87867F" stroke-width="1.3"/>
+      <circle r="4" fill="#788C5D"><animateMotion dur="3.4s" begin="1.7s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.45;0.7;1" calcMode="linear" path="M150 310 L480 360"/></circle>
+      <circle r="4" fill="#788C5D"><animateMotion dur="3.4s" begin="1.7s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.45;0.7;1" calcMode="linear" path="M774 310 L480 360"/></circle>
+
+      <!-- Synthesizer (Stage 4 — Pro) -->
+      <rect x="360" y="360" width="240" height="56" rx="10" fill="rgba(217,119,87,0.10)" stroke="#D97757" stroke-width="1.8"/>
+      <text x="480" y="381" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#B04A3F" letter-spacing="0.06em">STAGE 4 · PRO</text>
+      <text x="480" y="399" text-anchor="middle" font-family="Newsreader, serif" font-size="12.5" font-weight="600" fill="#141413">Synthesizer → BriefSchema</text>
+
+      <!-- Brief output -->
+      <rect x="220" y="456" width="230" height="60" rx="10" fill="#FFFFFF" stroke="#788C5D" stroke-width="1.6"/>
+      <text x="335" y="478" text-anchor="middle" font-family="Newsreader, serif" font-size="12.5" font-weight="600" fill="#141413">Brief · 3 NBAs + risks</text>
+      <text x="335" y="498" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#87867F">RECOMMENDATIONS · every NBA cited</text>
+      <line x1="450" y1="416" x2="360" y2="456" stroke="#87867F" stroke-width="1.5"/>
+      <polygon points="366,449 360,456 369,455" fill="#87867F"/>
+      <circle r="4" fill="#788C5D"><animateMotion dur="3.4s" begin="2.6s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.7;0.95;1" calcMode="linear" path="M450 416 L360 456"/></circle>
+
+      <!-- Follow-up (Stage 5 — mocked) -->
+      <rect x="510" y="456" width="230" height="60" rx="10" fill="#FFFFFF" stroke="#788C5D" stroke-width="1.4" stroke-dasharray="4,3"/>
+      <text x="625" y="478" text-anchor="middle" font-family="Newsreader, serif" font-size="12.5" font-weight="600" fill="#141413">Stage 5 · Follow-up</text>
+      <text x="625" y="498" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#87867F">FOLLOW-UP · mocked in POC</text>
+      <line x1="450" y1="486" x2="510" y2="486" stroke="#87867F" stroke-width="1.5"/>
+      <polygon points="502,482 510,486 502,490" fill="#87867F"/>
+
+      <!-- Feedback loop -->
+      <path d="M740 486 H905 V26 H160 V44" fill="none" stroke="#788C5D" stroke-width="1.4" stroke-dasharray="5,4"/>
+      <polygon points="156,36 160,44 164,36" fill="#788C5D"/>
+      <text x="905" y="20" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#788C5D">follow-ups → next week's signals</text>
+      <circle r="4" fill="#788C5D"><animateMotion dur="6s" repeatCount="indefinite" path="M740 486 H905 V26 H160 V44"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.5;0.55;0.95;1" dur="6s" repeatCount="indefinite"/></circle>
+    </svg>
+    <div class="caption">Stage 3 fans out to four specialists (asyncio.gather) · clay dots = Pro/Flash calls · dashed olive = weekly feedback loop</div>
+  </div>
+
+  <h3>Stage-by-stage detail</h3>
+  <div class="agent-grid">
+    <div class="agent-card">
+      <div class="a-stage">Stage 1</div>
+      <div class="a-name">Opportunity-Scout</div>
+      <span class="a-model flash">Gemini Flash</span>
+      <ul>
+        <li>Reads portfolio + IPS fixtures</li>
+        <li>Detects allocation drift vs target bands</li>
+        <li>Flags US-tech +5pp, Gulf RE +5pp over IPS</li>
+        <li>Produces ranked opportunity signals</li>
+      </ul>
+      <div class="a-output">Output schema: OpportunitySignals</div>
+    </div>
+    <div class="agent-card">
+      <div class="a-stage">Stage 2</div>
+      <div class="a-name">Client-Insights</div>
+      <span class="a-model flash">Gemini Flash</span>
+      <ul>
+        <li>RAG over Bergström meeting notes (3 dates)</li>
+        <li>Extracts preference evolution and concerns</li>
+        <li>Surfaces valuation unease on US-tech AI exposure</li>
+        <li>IPS constraint summary</li>
+      </ul>
+      <div class="a-output">Output schema: ClientSnapshot</div>
+    </div>
+    <div class="agent-card pro">
+      <div class="a-stage">Stage 3a</div>
+      <div class="a-name">Planner</div>
+      <span class="a-model pro">Gemini Pro</span>
+      <ul>
+        <li>Synthesises Scout + Insights outputs</li>
+        <li>Constructs a research plan for specialists</li>
+        <li>Assigns focus to each of the four specialist lanes</li>
+      </ul>
+      <div class="a-output">Output schema: Plan</div>
+    </div>
+    <div class="agent-card">
+      <div class="a-stage">Stage 3b–3e · parallel</div>
+      <div class="a-name">Four specialists</div>
+      <span class="a-model flash">Gemini Flash ×4</span>
+      <ul>
+        <li><strong>Intel-Gathering</strong> — World_Monitor signals (live/snapshot)</li>
+        <li><strong>Macro-RAG</strong> — IMF WEO / ECB Bulletin / BIS Quarterly</li>
+        <li><strong>Portfolio</strong> — RAG + arithmetic over holdings</li>
+        <li><strong>News</strong> — Vertex Search grounded news</li>
+      </ul>
+      <div class="a-output">Output schema: 4 × Findings</div>
+    </div>
+    <div class="agent-card pro">
+      <div class="a-stage">Stage 4</div>
+      <div class="a-name">Synthesizer</div>
+      <span class="a-model pro">Gemini Pro</span>
+      <ul>
+        <li>Assembles all specialist outputs</li>
+        <li>Produces 3 next-best-actions — each cited</li>
+        <li>Populates risk flags with severities</li>
+        <li>Validates output against BriefSchema</li>
+      </ul>
+      <div class="a-output">Output schema: BriefSchema (Pydantic)</div>
+    </div>
+    <div class="agent-card">
+      <div class="a-stage">Stage 5</div>
+      <div class="a-name">Follow-up-Capture</div>
+      <span class="a-model flash">Gemini Flash <span class="pill gray">mocked</span></span>
+      <ul>
+        <li>Captures advisor HITL actions post-review</li>
+        <li>Tags follow-ups for next week's Scout input</li>
+        <li>Closes the weekly feedback loop</li>
+      </ul>
+      <div class="a-output">Output schema: FollowUpLog</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Stage</th><th>Agent · Model</th><th>JD phase</th><th>Typed output</th></tr></thead>
+      <tbody>
+        <tr><td class="mc">1</td><td>Opportunity-Scout · Flash</td><td>Opportunity identification</td><td class="mc">OpportunitySignals</td></tr>
+        <tr><td class="mc">2</td><td>Client-Insights · Flash</td><td>Client insights</td><td class="mc">ClientSnapshot</td></tr>
+        <tr><td class="mc">3a–e</td><td>Planner (Pro) + 4 Specialists (Flash)</td><td>Meeting preparation</td><td class="mc">Plan + 4 × Findings</td></tr>
+        <tr><td class="mc">4</td><td>Synthesizer · Pro</td><td>Recommendations</td><td class="mc">BriefSchema · 3 NBAs</td></tr>
+        <tr><td class="mc">5</td><td>Follow-up-Capture · Flash <span class="pill gray">mocked</span></td><td>Follow-up</td><td class="mc">FollowUpLog → loop</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="infobox olive"><strong>Why this maps cleanly to the mandate.</strong> The five stages trace
+  the exact advisor workflow named in the role description. Every recommendation carries evidence
+  references, every risk flag carries a severity, and "I don't know" is a valid output in any field.
+  That is what makes it demonstrable to a regulated private bank.</div>
+</section>
+
+<!-- ── § 3 · RETRIEVAL PIPELINE ── -->
+<section>
+  <div class="section-eyebrow">§ 3 · Retrieval pipeline</div>
+  <h2>Grounded answers, with citations</h2>
+  <p>Three of the four specialists ground their findings in a hybrid retrieval pipeline. At query time,
+  the question is embedded with task-type <code>RETRIEVAL_QUERY</code> and searched against both a
+  dense vector store (Qdrant) and a sparse index (BM25); the two result sets are fused with
+  Reciprocal-Rank Fusion (k=60), then a Gemini Flash listwise reranker picks the top-5 with citations.
+  The index is built once — each chunk is augmented with Anthropic-style contextual prefixes before
+  embedding, which cuts retrieval failures roughly in half on cross-document questions.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 940 360" role="img" aria-label="Retrieval pipeline: query embedding into dense and sparse search, RRF fusion, reranking, top-5; amber lane = one-time index build">
+      <!-- Query -->
+      <rect x="24" y="62" width="110" height="48" rx="9" fill="#FFFFFF" stroke="#141413" stroke-width="1.5"/>
+      <text x="79" y="83" text-anchor="middle" font-family="Newsreader, serif" font-size="11.5" font-weight="600" fill="#141413">Query</text>
+      <text x="79" y="98" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#87867F">advisor / agent</text>
+
+      <!-- Embed query -->
+      <rect x="166" y="62" width="120" height="48" rx="9" fill="#FFFFFF" stroke="#141413" stroke-width="1.5"/>
+      <text x="226" y="80" text-anchor="middle" font-family="Newsreader, serif" font-size="11.5" font-weight="600" fill="#141413">Embed query</text>
+      <text x="226" y="96" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#87867F">RETRIEVAL_QUERY</text>
+
+      <!-- Dense + Sparse -->
+      <rect x="330" y="30" width="140" height="46" rx="9" fill="#FFFFFF" stroke="#D97757" stroke-width="1.6"/>
+      <text x="400" y="48" text-anchor="middle" font-family="Newsreader, serif" font-size="11.5" font-weight="600" fill="#141413">Qdrant · dense</text>
+      <text x="400" y="64" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#87867F">cosine · 768d</text>
+      <rect x="330" y="96" width="140" height="46" rx="9" fill="#FFFFFF" stroke="#C7A35F" stroke-width="1.6"/>
+      <text x="400" y="114" text-anchor="middle" font-family="Newsreader, serif" font-size="11.5" font-weight="600" fill="#141413">BM25 · sparse</text>
+      <text x="400" y="130" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#87867F">keyword match</text>
+
+      <!-- RRF -->
+      <rect x="510" y="62" width="96" height="48" rx="9" fill="#FFFFFF" stroke="#141413" stroke-width="1.5"/>
+      <text x="558" y="83" text-anchor="middle" font-family="Newsreader, serif" font-size="11.5" font-weight="600" fill="#141413">RRF</text>
+      <text x="558" y="98" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#87867F">fuse · k=60</text>
+
+      <!-- Flash reranker -->
+      <rect x="646" y="62" width="132" height="48" rx="9" fill="rgba(217,119,87,0.10)" stroke="#D97757" stroke-width="1.6"/>
+      <text x="712" y="80" text-anchor="middle" font-family="Newsreader, serif" font-size="11.5" font-weight="600" fill="#141413">Flash reranker</text>
+      <text x="712" y="96" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#87867F">listwise · top-5</text>
+
+      <!-- Top-5 -->
+      <rect x="818" y="62" width="100" height="48" rx="9" fill="rgba(120,140,93,0.10)" stroke="#788C5D" stroke-width="1.6"/>
+      <text x="868" y="80" text-anchor="middle" font-family="Newsreader, serif" font-size="11.5" font-weight="600" fill="#141413">Top-5</text>
+      <text x="868" y="96" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#87867F">+ citations</text>
+
+      <!-- query-time connectors -->
+      <line x1="134" y1="86" x2="166" y2="86" stroke="#87867F" stroke-width="1.5"/><polygon points="158,82 166,86 158,90" fill="#87867F"/>
+      <line x1="286" y1="86" x2="330" y2="53" stroke="#87867F" stroke-width="1.4"/><polygon points="324,52 330,53 326,59" fill="#87867F"/>
+      <line x1="286" y1="86" x2="330" y2="119" stroke="#87867F" stroke-width="1.4"/><polygon points="326,113 330,119 324,120" fill="#87867F"/>
+      <line x1="470" y1="53" x2="510" y2="80" stroke="#87867F" stroke-width="1.4"/><polygon points="504,75 510,80 502,82" fill="#87867F"/>
+      <line x1="470" y1="119" x2="510" y2="92" stroke="#87867F" stroke-width="1.4"/><polygon points="502,90 510,92 504,98" fill="#87867F"/>
+      <line x1="606" y1="86" x2="646" y2="86" stroke="#87867F" stroke-width="1.5"/><polygon points="638,82 646,86 638,90" fill="#87867F"/>
+      <line x1="778" y1="86" x2="818" y2="86" stroke="#87867F" stroke-width="1.5"/><polygon points="810,82 818,86 810,90" fill="#87867F"/>
+      <circle r="4" fill="#D97757"><animateMotion dur="4s" repeatCount="indefinite" path="M79 86 L166 86 L226 86 L330 53"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="4s" repeatCount="indefinite"/></circle>
+      <circle r="4" fill="#D97757"><animateMotion dur="4s" begin="0.4s" repeatCount="indefinite" path="M226 86 L330 119"/></circle>
+      <circle r="4" fill="#D97757"><animateMotion dur="4s" begin="2s" repeatCount="indefinite" path="M510 86 L558 86 L646 86 L712 86 L818 86 L868 86"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="4s" begin="2s" repeatCount="indefinite"/></circle>
+
+      <!-- divider -->
+      <line x1="24" y1="190" x2="916" y2="190" stroke="#D1CFC5" stroke-width="1" stroke-dasharray="3,4"/>
+      <text x="24" y="180" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="600" fill="#87867F" letter-spacing="0.08em">QUERY TIME ▲   ·   INDEX TIME (BUILT ONCE) ▼</text>
+
+      <!-- Index-time lane -->
+      <rect x="24" y="230" width="120" height="48" rx="9" fill="rgba(199,163,95,0.10)" stroke="#C7A35F" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="84" y="251" text-anchor="middle" font-family="Newsreader, serif" font-size="11.5" font-weight="600" fill="#141413">Corpus</text>
+      <text x="84" y="266" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#87867F">~50 docs</text>
+      <rect x="178" y="230" width="124" height="48" rx="9" fill="rgba(199,163,95,0.10)" stroke="#C7A35F" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="240" y="251" text-anchor="middle" font-family="Newsreader, serif" font-size="11.5" font-weight="600" fill="#141413">Semantic chunk</text>
+      <text x="240" y="266" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#87867F">~500 chunks</text>
+      <rect x="336" y="230" width="150" height="48" rx="9" fill="rgba(199,163,95,0.10)" stroke="#C7A35F" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="411" y="248" text-anchor="middle" font-family="Newsreader, serif" font-size="11.5" font-weight="600" fill="#141413">Contextual augment</text>
+      <text x="411" y="264" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#87867F">Flash · prefix each chunk</text>
+      <rect x="520" y="230" width="140" height="48" rx="9" fill="rgba(199,163,95,0.10)" stroke="#C7A35F" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="590" y="248" text-anchor="middle" font-family="Newsreader, serif" font-size="11.5" font-weight="600" fill="#141413">Embed docs</text>
+      <text x="590" y="264" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#87867F">RETRIEVAL_DOCUMENT</text>
+
+      <!-- index-time connectors -->
+      <line x1="144" y1="254" x2="178" y2="254" stroke="#C7A35F" stroke-width="1.4" stroke-dasharray="4,3"/><polygon points="170,250 178,254 170,258" fill="#C7A35F"/>
+      <line x1="302" y1="254" x2="336" y2="254" stroke="#C7A35F" stroke-width="1.4" stroke-dasharray="4,3"/><polygon points="328,250 336,254 328,258" fill="#C7A35F"/>
+      <line x1="486" y1="254" x2="520" y2="254" stroke="#C7A35F" stroke-width="1.4" stroke-dasharray="4,3"/><polygon points="512,250 520,254 512,258" fill="#C7A35F"/>
+      <path d="M660 254 H700 V53 H470" fill="none" stroke="#C7A35F" stroke-width="1.4" stroke-dasharray="4,3"/>
+      <polygon points="478,49 470,53 478,57" fill="#C7A35F"/>
+      <text x="712" y="166" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#8C7038">writes index → Qdrant</text>
+      <circle r="3.5" fill="#C7A35F"><animateMotion dur="5s" repeatCount="indefinite" path="M84 254 L240 254 L411 254 L590 254 L700 254 L700 53 L470 53"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.08;0.92;1" dur="5s" repeatCount="indefinite"/></circle>
+    </svg>
+    <div class="caption">Hybrid retrieval · dense (Qdrant) + sparse (BM25) → RRF k=60 → Flash reranker → top-5 · amber lane = one-time index build</div>
+  </div>
+
+  <div class="infobox amber"><strong>Built once, shipped in the container.</strong>
+  The index build (chunk → contextual augment → embed → Qdrant) runs locally before deploy;
+  the resulting <code>qdrant_data/</code> and <code>bm25.json</code> are baked into the Docker image.
+  At runtime the store is read-only — no vector-DB service to provision, secure, or pay for.</div>
+</section>
+
+<!-- ── § 4 · MODEL ROUTING TABLE ── -->
+<section>
+  <div class="section-eyebrow">§ 4 · Model routing</div>
+  <h2>Flash carries breadth; Pro handles depth</h2>
+  <p>Gemini 2.5 Flash handles all breadth-of-work tasks — scouts, specialist analysts, reranker, chat
+  assistant (~10 calls per brief). Gemini 2.5 Pro is reserved for the two reasoning-critical
+  stages — Planner and Synthesizer (2 calls per brief). This split keeps cost low while keeping the
+  reasoning backbone strong.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Stage / Component</th><th>Model</th><th>Why</th><th>Calls/brief</th></tr></thead>
+      <tbody>
+        <tr><td>Opportunity-Scout (Stage 1)</td><td class="mc">gemini-2.5-flash</td><td class="sub">Pattern detection over structured fixtures — Flash sufficient</td><td class="mc">1</td></tr>
+        <tr><td>Client-Insights (Stage 2)</td><td class="mc">gemini-2.5-flash</td><td class="sub">Short-context RAG over meeting notes</td><td class="mc">1</td></tr>
+        <tr><td>Planner (Stage 3a)</td><td class="mc">gemini-2.5-pro</td><td class="sub">Multi-step reasoning: integrate Stages 1+2, design research plan</td><td class="mc">1</td></tr>
+        <tr><td>Intel-Gathering (Stage 3b)</td><td class="mc">gemini-2.5-flash</td><td class="sub">Signal aggregation from World_Monitor</td><td class="mc">1</td></tr>
+        <tr><td>Macro-RAG (Stage 3c)</td><td class="mc">gemini-2.5-flash</td><td class="sub">Dense RAG over ECB/IMF/BIS corpus</td><td class="mc">1</td></tr>
+        <tr><td>Portfolio (Stage 3d)</td><td class="mc">gemini-2.5-flash</td><td class="sub">Arithmetic + RAG over portfolio holdings</td><td class="mc">1</td></tr>
+        <tr><td>News (Stage 3e)</td><td class="mc">gemini-2.5-flash</td><td class="sub">Vertex Search grounded news digest</td><td class="mc">1</td></tr>
+        <tr><td>Synthesizer (Stage 4)</td><td class="mc">gemini-2.5-pro</td><td class="sub">Integration of all specialist findings into BriefSchema; NBA citation</td><td class="mc">1</td></tr>
+        <tr><td>Follow-up-Capture (Stage 5)</td><td class="mc">gemini-2.5-flash</td><td class="sub">Structured extraction of HITL actions</td><td class="mc">1</td></tr>
+        <tr><td>Flash listwise reranker</td><td class="mc">gemini-2.5-flash</td><td class="sub">Listwise top-5 selection from RRF candidates</td><td class="mc">3–6</td></tr>
+        <tr><td>Chat assistant</td><td class="mc">gemini-2.5-flash</td><td class="sub">Low-latency follow-up questions</td><td class="mc">n (on demand)</td></tr>
+        <tr><td>Contextual augmentation (index build)</td><td class="mc">gemini-2.5-flash</td><td class="sub">Prefix each chunk once at build time</td><td class="mc">~500 (once)</td></tr>
+        <tr><td>Embeddings</td><td class="mc">gemini-embedding-001</td><td class="sub">task-typed @768d · RETRIEVAL_QUERY / RETRIEVAL_DOCUMENT</td><td class="mc">1 + n</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="viz-grid">
+    <div class="viz-card">
+      <div class="viz-title">Model split — one brief</div>
+      <div class="viz-sub">~10 Flash calls vs 2 Pro calls per brief generation.</div>
+      <div id="chart-modelsplit" style="height:260px;"></div>
+    </div>
+    <div class="viz-card">
+      <div class="viz-title">Latency budget per stage</div>
+      <div class="viz-sub">Stage 3 specialists run in parallel — bar is max of four concurrent calls.</div>
+      <div id="chart-latency" style="height:260px;"></div>
+    </div>
+  </div>
+  <div class="viz-cap">Estimates · Vertex AI Gemini 2.5 · single Bergström brief · 2026-05-26</div>
+</section>
+
+<!-- ── § 5 · DECISIONS LOG ── -->
+<section>
+  <div class="section-eyebrow">§ 5 · Decisions log</div>
+  <h2>Why we built it this way</h2>
+  <p>Key architecture decisions, with rationale.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Decision</th><th>Choice</th><th>Rationale</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>LLM provider</strong></td>
+          <td class="mc">Vertex AI Gemini only</td>
+          <td class="sub">Single GCP service account covers everything — no additional API keys or spend. Gemini 2.5 Pro/Flash SOTA at the time of build; 1M-token context handles long meeting-note chains cleanly.</td>
+        </tr>
+        <tr>
+          <td><strong>Vector store</strong></td>
+          <td class="mc">Qdrant embedded (in-process)</td>
+          <td class="sub">No managed vector DB to provision, secure, or pay for. Index is built once, baked into the Docker image, and served read-only. Qdrant embedded has strong Rust-core performance; the corpus (~500 chunks) is small enough that memory is no concern.</td>
+        </tr>
+        <tr>
+          <td><strong>Hybrid retrieval</strong></td>
+          <td class="mc">Dense + BM25 → RRF k=60</td>
+          <td class="sub">Pure dense fails on exact ticker names and IPS clause references (e.g. "single-position limit 5%"). Pure sparse misses semantic paraphrases. RRF k=60 is the SOTA fusion baseline with no hyperparameter tuning required.</td>
+        </tr>
+        <tr>
+          <td><strong>Contextual Retrieval</strong></td>
+          <td class="mc">Anthropic-style prefix per chunk</td>
+          <td class="sub">Cross-document contextual questions (e.g. linking BIS AI-boom analysis to Bergström US-tech allocation) require each chunk to carry enough document-level context. The prefix is generated once at build time via Flash; retrieval failures on contextual intents dropped from ~60% to ~35%.</td>
+        </tr>
+        <tr>
+          <td><strong>Embedding model</strong></td>
+          <td class="mc">gemini-embedding-001 @768d task-typed</td>
+          <td class="sub">Task-typing (RETRIEVAL_QUERY vs RETRIEVAL_DOCUMENT) is the single highest-leverage free-tier tuning available. Avoids asymmetric embedding space mismatch between queries and document chunks.</td>
+        </tr>
+        <tr>
+          <td><strong>Reranker</strong></td>
+          <td class="mc">Gemini Flash listwise</td>
+          <td class="sub">Cross-encoder style reranking without a separate model deployment. Flash listwise prompt scores all k candidates simultaneously — ~200ms latency overhead, substantial precision improvement over RRF-only.</td>
+        </tr>
+        <tr>
+          <td><strong>Orchestration</strong></td>
+          <td class="mc">LlamaIndex Workflows</td>
+          <td class="sub">Typed event/step model enforces output contracts at each stage; asyncio.gather for the parallel specialist fan-out. LlamaIndex's Phoenix integration provides distributed tracing at no cost.</td>
+        </tr>
+        <tr>
+          <td><strong>Brief caching</strong></td>
+          <td class="mc">Pre-generated, served instantly</td>
+          <td class="sub">Full brief generation takes ~16 s. Serving a cached result eliminates advisor wait time — the cockpit loads immediately, and the orchestrator regenerates in the background on a schedule. This also means cold-start latency does not matter for the user experience.</td>
+        </tr>
+        <tr>
+          <td><strong>Deployment host</strong></td>
+          <td class="mc">HF Spaces (POC) / Cloud Run (target)</td>
+          <td class="sub">The GCP sandbox service account does not have Cloud Run deployer permissions. HF Spaces offers free zero-card Docker hosting with secrets injection — identical image, zero additional work. The <code>cloudbuild.yaml</code> is ready for Cloud Run when permissions are granted.</td>
+        </tr>
+        <tr>
+          <td><strong>Frontend charts</strong></td>
+          <td class="mc">Apache ECharts (Apache 2.0)</td>
+          <td class="sub">No licensing risk. Rich financial chart types (radar, bar, gauge, pie). First-class React wrapper (echarts-for-react). Animation and theming APIs match the house palette perfectly.</td>
+        </tr>
+        <tr>
+          <td><strong>Eval judge</strong></td>
+          <td class="mc">Custom Gemini Flash judge</td>
+          <td class="sub">OSS Ragas context-precision/recall requires an OpenAI-compatible endpoint; the Ragas 0.4.x Gemini adapter hit a version quirk that returned nulls. Rather than spend time on adapter patches, a custom Flash judge was wired directly — same methodology, fully in-budget, honest about the limitation in EVAL.html.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <div>Architecture · Nordea AWM AI POC · 2026-05-26 · Alim Polat</div>
+  <div>Pairs with: <a href="docs/Architecture_Flow_2026-05-25.html">Architecture_Flow_2026-05-25.html</a> · <a href="EVAL.html">EVAL.html</a></div>
+</footer>
+
+</div><!-- .sheet -->
+
+<script>
+  /* ── scroll fade ── */
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.06 });
+  document.querySelectorAll('section').forEach(s => obs.observe(s));
+
+  /* ── house chart theme ── */
+  const CLAY='#D97757', OLIVE='#788C5D', AMBER='#C7A35F', RUST='#B04A3F';
+  const SLATE='#141413', GRAY300='#D1CFC5', GRAY500='#87867F';
+  const SERIF="'Newsreader', Georgia, serif", MONO="'JetBrains Mono', monospace";
+  const baseTooltip = {
+    backgroundColor:'rgba(255,255,255,0.96)', borderColor:GRAY300,
+    textStyle:{ color:SLATE, fontFamily:SERIF, fontSize:14 },
+    extraCssText:'box-shadow:0 4px 12px rgba(0,0,0,0.08);border-radius:8px;'
+  };
+  const baseAnim = { animation:true, animationEasing:'cubicOut', animationDuration:900 };
+
+  /* model split pie */
+  const modelsplit = echarts.init(document.getElementById('chart-modelsplit'));
+  modelsplit.setOption({ ...baseAnim, tooltip:{ ...baseTooltip, trigger:'item' },
+    legend:{ bottom:8, itemWidth:12, itemHeight:12, textStyle:{ fontFamily:MONO, fontSize:11, color:SLATE } },
+    series:[{ type:'pie', radius:['40%','70%'], center:['50%','45%'],
+      itemStyle:{ borderRadius:6, borderColor:'#FFFFFF', borderWidth:2 },
+      label:{ formatter:'{b}\n{d}%', fontFamily:MONO, fontSize:11, color:SLATE },
+      data:[
+        { value:10, name:'Flash (~10 calls)', itemStyle:{ color:OLIVE } },
+        { value:2, name:'Pro (2 calls)', itemStyle:{ color:CLAY } },
+      ]
+    }]
+  });
+
+  /* latency bar */
+  const latency = echarts.init(document.getElementById('chart-latency'));
+  latency.setOption({ ...baseAnim, tooltip:{ ...baseTooltip, trigger:'axis',
+    formatter:params => `${params[0].name}<br/>${params[0].marker}${params[0].value} s` },
+    grid:{ left:20, right:20, top:10, bottom:60, containLabel:true },
+    xAxis:{ type:'category', data:['Scout','Insights','Planner','Specialists\n(parallel max)','Synthesizer','Cache write'],
+      axisLabel:{ fontFamily:MONO, fontSize:10, color:GRAY500, rotate:30 }, axisLine:{ lineStyle:{ color:GRAY300 } } },
+    yAxis:{ type:'value', name:'seconds', nameTextStyle:{ fontFamily:MONO, fontSize:10, color:GRAY500 },
+      axisLabel:{ fontFamily:MONO, fontSize:10, color:GRAY500 }, splitLine:{ lineStyle:{ color:GRAY300, type:'dashed' } } },
+    series:[{ type:'bar', barWidth:'55%',
+      itemStyle:{ borderRadius:[4,4,0,0],
+        color: params => [OLIVE,OLIVE,CLAY,OLIVE,CLAY,GRAY500][params.dataIndex] },
+      data:[1.5, 1.8, 2.2, 6.0, 3.5, 1.0]
+    }]
+  });
+
+  window.addEventListener('resize', () => { modelsplit.resize(); latency.resize(); });
+</script>
+</body>
+</html>

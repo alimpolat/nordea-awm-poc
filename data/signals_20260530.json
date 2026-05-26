@@ -1,0 +1,54 @@
+{
+  "as_of": "2026-05-30T16:00:00Z",
+  "note": "Frozen World_Monitor finance snapshot for the POC. Plausible Sat 2026-05-30 close values. Live mode (INTEL_MODE=live) reads these same signals from World_Monitor in production once an API key is provisioned.",
+  "signals": {
+    "brent_oil": {
+      "source": "ICE Brent (World_Monitor snapshot)",
+      "metric": "Brent crude, USD/bbl",
+      "value": 78.2,
+      "relevance": "Energy exposure and Gulf-economy linkage; informs Gulf real-estate and alternatives view."
+    },
+    "wti_oil": {
+      "source": "NYMEX WTI (World_Monitor snapshot)",
+      "metric": "WTI crude, USD/bbl",
+      "value": 74.1,
+      "relevance": "US energy benchmark; spread to Brent signals global demand balance."
+    },
+    "ecb_deposit_rate": {
+      "source": "ECB (World_Monitor snapshot)",
+      "metric": "ECB deposit facility rate, %",
+      "value": 3.25,
+      "relevance": "Discount rate for EU fixed income; anchors the 15% EU bond sleeve duration call."
+    },
+    "sama_repo_rate": {
+      "source": "SAMA (World_Monitor snapshot)",
+      "metric": "Saudi Central Bank repo rate, %",
+      "value": 5.5,
+      "relevance": "Gulf monetary stance; cap-rate input for the 15% Gulf real-estate sleeve."
+    },
+    "usd_index_dxy": {
+      "source": "ICE DXY (World_Monitor snapshot)",
+      "metric": "US dollar index (DXY)",
+      "value": 103.4,
+      "relevance": "FX translation risk on the 20% US-tech sleeve for an SEK-base client."
+    },
+    "omxs30": {
+      "source": "Nasdaq Stockholm (World_Monitor snapshot)",
+      "metric": "OMXS30 index level",
+      "value": 2540.0,
+      "relevance": "Nordic equity momentum; benchmark for the 35% Nordic equity sleeve."
+    },
+    "ig_credit_spread_bps": {
+      "source": "iBoxx EUR IG (World_Monitor snapshot)",
+      "metric": "EUR investment-grade credit spread, bps",
+      "value": 118.0,
+      "relevance": "Credit risk premium; widening would pressure the EU fixed-income sleeve."
+    },
+    "gulf_reit_mom": {
+      "source": "Gulf REIT composite (World_Monitor snapshot)",
+      "metric": "Gulf REIT index, month-over-month %",
+      "value": 2.1,
+      "relevance": "Direct read on the 15% Gulf real-estate sleeve performance."
+    }
+  }
+}

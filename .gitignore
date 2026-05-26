@@ -1,0 +1,32 @@
+# secrets & credentials
+.env
+.env.*
+!.env.example
+gg-gcpsbprojs-*.json
+*service-account*.json
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# large corpus binaries (kept local; source URLs documented in README)
+data/corpus/*.pdf
+
+# frontend
+frontend/node_modules/
+frontend/dist/
+
+# build output (generated at docker build from frontend/dist)
+app/static/
+
+# contextual retrieval cache (build-time derived data; re-generated on each index run)
+data/contextual_cache/
+
+# Qdrant embedded lock file (data files ARE committed; lock is transient)
+qdrant_data/.lock
+qdrant_data/*.lock
+.gstack/

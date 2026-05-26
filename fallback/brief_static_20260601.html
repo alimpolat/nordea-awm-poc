@@ -1,0 +1,959 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bergström Monday Brief · Static Snapshot · 2026-06-01</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+  :root {
+    --ivory: #FAF9F5; --paper: #FFFFFF; --slate: #141413;
+    --clay: #D97757; --clay-bg: rgba(217,119,87,0.10);
+    --oat: #E3DACC;
+    --olive: #788C5D; --olive-bg: rgba(120,140,93,0.12);
+    --rust: #B04A3F; --rust-bg: rgba(176,74,63,0.10);
+    --amber: #C7A35F; --amber-bg: rgba(199,163,95,0.14);
+    --gray-100: #F7F4EC; --gray-150: #F0EEE6; --gray-300: #D1CFC5;
+    --gray-500: #87867F; --gray-700: #3D3D3A;
+    --serif: 'Newsreader', Georgia, "Times New Roman", serif;
+    --mono: 'JetBrains Mono', ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--ivory);color:var(--slate);font-family:var(--serif);font-weight:400;font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;padding:0 24px 96px;}
+
+  .sheet{max-width:1080px;margin:0 auto;}
+
+  /* top banner */
+  .top-banner{background:var(--amber-bg);border-bottom:2px solid var(--amber);padding:14px 0;margin-bottom:0;}
+  .top-banner .sheet{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+  .top-banner .tb-label{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#8C7038;white-space:nowrap;}
+  .top-banner .tb-text{font-family:var(--mono);font-size:12px;color:var(--gray-700);flex:1;}
+  .top-banner a{color:var(--clay);border-bottom:1px solid var(--amber);font-weight:500;}
+  .top-banner a:hover{border-bottom-color:var(--clay);}
+  .top-banner .tb-gen{font-family:var(--mono);font-size:11px;color:var(--gray-500);white-space:nowrap;}
+
+  /* header */
+  header.hero{padding:48px 0 32px;}
+  .eyebrow{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--clay);margin-bottom:14px;}
+  h1{font-family:var(--serif);font-weight:500;font-size:46px;letter-spacing:-0.015em;line-height:1.08;margin-bottom:14px;}
+  .lead{font-size:18px;line-height:1.65;color:var(--gray-700);max-width:840px;margin-bottom:20px;}
+  .lead strong{color:var(--slate);}
+  .metabar{display:flex;flex-wrap:wrap;gap:0;font-family:var(--mono);font-size:11.5px;color:var(--gray-500);border-top:1px solid var(--gray-300);border-bottom:1px solid var(--gray-300);padding:14px 0;margin-top:8px;}
+  .metabar>div{padding:0 22px 0 0;margin-right:22px;border-right:1px solid var(--gray-300);}
+  .metabar>div:last-child{border-right:none;margin-right:0;padding-right:0;}
+  .metabar strong{color:var(--slate);font-weight:500;}
+
+  /* sections */
+  section{margin-top:56px;opacity:0;transform:translateY(8px);transition:opacity 600ms ease,transform 600ms ease;}
+  section.visible{opacity:1;transform:translateY(0);}
+  .section-eyebrow{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--clay);margin-bottom:8px;}
+  h2{font-family:var(--serif);font-weight:500;font-size:30px;letter-spacing:-0.01em;line-height:1.2;margin-bottom:16px;}
+  h3{font-family:var(--serif);font-weight:500;font-size:22px;margin:28px 0 10px;color:var(--slate);}
+  h4{font-family:var(--serif);font-weight:500;font-size:18px;margin:0 0 6px;color:var(--slate);}
+  p{font-size:16px;line-height:1.65;color:var(--gray-700);margin-bottom:12px;max-width:880px;}
+  p strong{color:var(--slate);}
+  p code,li code,.mono,td code{font-family:var(--mono);font-size:13px;background:var(--gray-150);padding:1px 6px;border-radius:3px;color:var(--slate);}
+  ul,ol{margin:10px 0 14px 24px;}
+  ul li,ol li{font-size:16px;line-height:1.6;color:var(--gray-700);margin-bottom:6px;}
+  ul li strong,ol li strong{color:var(--slate);}
+
+  a{color:var(--clay);text-decoration:none;border-bottom:1px solid transparent;transition:border-color 200ms ease;}
+  a:hover{border-bottom-color:var(--clay);}
+
+  /* tables */
+  .table-wrap{overflow-x:auto;margin:14px 0;}
+  table{width:100%;border-collapse:collapse;background:var(--paper);border:1.5px solid var(--gray-300);border-radius:14px;overflow:hidden;font-size:13.5px;}
+  th,td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--gray-300);vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  th{background:var(--gray-100);font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray-500);font-weight:500;}
+  td.mc{font-family:var(--mono);font-size:12px;color:var(--slate);}
+  td.num{font-family:var(--mono);font-size:12px;text-align:right;}
+  td.pos{color:var(--olive);}
+  td.neg{color:var(--rust);}
+
+  /* cards */
+  .card{background:var(--paper);border:1.5px solid var(--gray-300);border-radius:14px;padding:22px 24px;margin:16px 0;}
+  .card+.card{margin-top:12px;}
+
+  /* infobox */
+  .infobox{background:var(--clay-bg);border-left:3px solid var(--clay);padding:14px 20px;margin:14px 0;border-radius:4px;font-size:15px;line-height:1.6;color:var(--gray-700);max-width:1000px;}
+  .infobox strong{color:var(--clay);}
+  .infobox.olive{background:var(--olive-bg);border-left-color:var(--olive);}
+  .infobox.olive strong{color:var(--olive);}
+  .infobox.amber{background:var(--amber-bg);border-left-color:var(--amber);}
+  .infobox.amber strong{color:#8C7038;}
+  .infobox.rust{background:var(--rust-bg);border-left-color:var(--rust);}
+  .infobox.rust strong{color:var(--rust);}
+
+  /* pills & badges */
+  .pill{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 9px;border-radius:999px;letter-spacing:0.08em;text-transform:uppercase;}
+  .pill.olive{background:var(--olive-bg);color:var(--olive);}
+  .pill.amber{background:var(--amber-bg);color:#8C7038;}
+  .pill.rust{background:var(--rust-bg);color:var(--rust);}
+  .pill.clay{background:var(--clay-bg);color:var(--clay);}
+  .pill.gray{background:var(--gray-150);color:var(--gray-500);}
+
+  /* priority chip */
+  .priority-chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px 3px 7px;border-radius:999px;}
+  .priority-chip.primary{background:#B04A3F1A;color:var(--rust);}
+  .priority-chip.secondary{background:var(--amber-bg);color:#8C7038;}
+  .priority-chip.tertiary{background:var(--olive-bg);color:var(--olive);}
+  .priority-chip .dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+  /* confidence badges */
+  .conf{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:0.08em;}
+  .conf.high{background:var(--olive-bg);color:var(--olive);}
+  .conf.medium{background:var(--amber-bg);color:#8C7038;}
+  .conf.low_needs_verification{background:var(--rust-bg);color:var(--rust);}
+
+  /* severity */
+  .sev{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:0.08em;}
+  .sev.action{background:var(--rust-bg);color:var(--rust);}
+  .sev.watch{background:var(--amber-bg);color:#8C7038;}
+  .sev.info{background:var(--gray-150);color:var(--gray-500);}
+
+  /* intel mode badge */
+  .intel-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;padding:3px 10px;border-radius:4px;text-transform:uppercase;letter-spacing:0.1em;background:var(--clay-bg);color:var(--clay);border:1px solid rgba(217,119,87,0.3);}
+
+  /* charts */
+  .viz-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:16px 0;}
+  .viz-grid.three{grid-template-columns:1fr 1fr 1fr;}
+  .viz-card{background:var(--paper);border:1.5px solid var(--gray-300);border-radius:14px;padding:16px 18px 12px;}
+  .viz-card.full{grid-column:1/-1;}
+  .viz-title{font-family:var(--mono);font-weight:600;font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray-700);margin-bottom:2px;}
+  .viz-sub{font-family:var(--serif);font-size:13px;color:var(--gray-500);margin-bottom:8px;line-height:1.4;}
+  .chart{width:100%;}
+  .viz-cap{font-family:var(--mono);font-size:10.5px;color:var(--gray-500);text-align:right;margin-top:3px;}
+
+  /* NBA card */
+  .nba-card{background:var(--paper);border:1.5px solid var(--gray-300);border-radius:14px;padding:22px 24px;margin:12px 0;}
+  .nba-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+  .nba-title-block{flex:1;}
+  .nba-badges{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .nba-body{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:14px 0;}
+  .nba-field label{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray-500);display:block;margin-bottom:3px;}
+  .nba-field p{font-size:14.5px;color:var(--gray-700);margin:0;}
+  .nba-evidence{margin-top:12px;padding-top:12px;border-top:1px solid var(--gray-300);}
+  .nba-evidence-label{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray-500);margin-bottom:6px;}
+  .evidence-ref{font-family:var(--mono);font-size:11.5px;color:var(--gray-700);}
+  .nba-trace{margin-top:10px;background:var(--gray-100);border-radius:6px;padding:9px 12px;font-family:var(--mono);font-size:11.5px;color:var(--gray-700);line-height:1.5;}
+  .nba-trace label{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray-500);display:block;margin-bottom:3px;}
+
+  /* HITL buttons (disabled/static) */
+  .hitl-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center;}
+  .hitl-label{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray-500);margin-right:4px;}
+  .hitl-btn{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:6px 14px;border-radius:6px;border:1.5px solid var(--gray-300);background:var(--gray-100);color:var(--gray-500);cursor:not-allowed;opacity:0.55;position:relative;}
+  .hitl-btn svg{width:12px;height:12px;opacity:0.7;}
+  .hitl-static-note{font-family:var(--mono);font-size:10.5px;color:var(--gray-500);font-style:italic;margin-top:6px;}
+
+  /* risk flags */
+  .risk-card{background:var(--paper);border:1.5px solid var(--gray-300);border-radius:14px;padding:16px 22px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;}
+  .risk-card.action{border-left:3px solid var(--rust);}
+  .risk-card.watch{border-left:3px solid var(--amber);}
+  .risk-icon{flex-shrink:0;margin-top:2px;}
+  .risk-body .risk-kind{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px;}
+  .risk-body .risk-kind.action{color:var(--rust);}
+  .risk-body .risk-kind.watch{color:#8C7038;}
+  .risk-body p{font-size:14.5px;color:var(--gray-700);margin:0;}
+
+  /* weekend changes */
+  .wc-item{background:var(--paper);border:1.5px solid var(--gray-300);border-radius:10px;padding:14px 18px;margin:10px 0;display:flex;gap:14px;align-items:flex-start;}
+  .wc-tag{flex-shrink:0;margin-top:2px;}
+  .wc-body .wc-headline{font-size:15.5px;font-weight:500;color:var(--slate);margin-bottom:4px;line-height:1.4;}
+  .wc-body .wc-meta{font-family:var(--mono);font-size:10.5px;color:var(--gray-500);}
+  .wc-body a{font-size:10.5px;}
+
+  /* after meeting */
+  .meeting-note{background:var(--gray-100);border:1.5px dashed var(--gray-300);border-radius:14px;padding:20px 24px;margin:14px 0;}
+  .meeting-note .mn-label{font-family:var(--mono);font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-500);margin-bottom:8px;}
+  .meeting-note textarea{width:100%;min-height:100px;background:var(--paper);border:1.5px solid var(--gray-300);border-radius:8px;padding:10px 14px;font-family:var(--serif);font-size:15px;color:var(--slate);resize:vertical;cursor:not-allowed;opacity:0.6;}
+
+  /* footer */
+  footer{border-top:1px solid var(--gray-300);margin-top:72px;padding-top:22px;color:var(--gray-500);font-family:var(--mono);font-size:11.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+
+  /* concerns/restrictions chips */
+  .chip-row{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0;}
+  .chip{font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:6px;background:var(--gray-150);color:var(--gray-700);border:1px solid var(--gray-300);}
+  .chip.red{background:var(--rust-bg);color:var(--rust);border-color:rgba(176,74,63,0.2);}
+
+  /* holdings table row highlight */
+  tr.breach td{color:var(--rust) !important;}
+  tr.breach td:first-child{font-weight:500;}
+  .breach-tag{font-family:var(--mono);font-size:9.5px;color:var(--rust);margin-left:6px;font-weight:600;}
+
+  @media(max-width:720px){
+    body{padding:0 16px 60px;}
+    h1{font-size:32px;}
+    h2{font-size:24px;}
+    .viz-grid,.viz-grid.three{grid-template-columns:1fr;}
+    .nba-body{grid-template-columns:1fr;}
+    .top-banner .sheet{flex-direction:column;gap:8px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ TOP BANNER ═══ -->
+<div class="top-banner">
+  <div class="sheet">
+    <span class="tb-label">⚡ Static Snapshot</span>
+    <span class="tb-text">
+      The live interactive demo is at
+      <a href="https://alimpolat-nordea-awm-poc.hf.space" target="_blank" rel="noopener">alimpolat-nordea-awm-poc.hf.space</a>
+      — this file is an offline safety copy.
+    </span>
+    <span class="tb-gen" id="gen-ts"></span>
+  </div>
+</div>
+
+<div class="sheet">
+
+<!-- ═══ HEADER ═══ -->
+<header class="hero">
+  <div class="eyebrow">Monday Brief · Nordea Private Banking · 2026-06-01</div>
+  <h1>Bergström Family Office</h1>
+  <p class="lead">
+    Advisor-prepared Monday brief for the <strong>Bergström Family Office</strong> — SEK 480M UHNW,
+    global tilt. Three next-best actions flagged, two critical IPS breaches require immediate attention.
+  </p>
+  <div class="metabar">
+    <div><strong>AUM</strong> · SEK 480 000 000</div>
+    <div><strong>Meeting</strong> · Today, 2026-06-01</div>
+    <div><strong>Last Touch</strong> · 2026-04-14</div>
+    <div><strong>Intel Mode</strong> · <span class="intel-badge" id="intel-mode-badge"></span></div>
+  </div>
+</header>
+
+<!-- ═══ SECTION 1 — CLIENT OVERVIEW ═══ -->
+<section id="s-client">
+  <div class="section-eyebrow">01 · Client Overview</div>
+  <h2>Portfolio at a glance</h2>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;">
+    <div>
+      <p style="margin-bottom:8px;"><strong>Stated Concerns</strong></p>
+      <div class="chip-row" id="concerns-chips"></div>
+    </div>
+    <div>
+      <p style="margin-bottom:8px;"><strong>Investment Restrictions</strong></p>
+      <div class="chip-row" id="restrictions-chips"></div>
+    </div>
+  </div>
+
+  <!-- Allocation charts -->
+  <div class="viz-grid">
+    <div class="viz-card">
+      <div class="viz-title">Current vs Target Allocation</div>
+      <div class="viz-sub">Market value weight by asset class, SEK 480M AUM</div>
+      <div class="chart" id="chart-donut" style="height:280px;"></div>
+      <div class="viz-cap">Current allocations computed from holdings · Target from IPS</div>
+    </div>
+    <div class="viz-card">
+      <div class="viz-title">Allocation Drift</div>
+      <div class="viz-sub">Current minus target in percentage points</div>
+      <div class="chart" id="chart-drift" style="height:280px;"></div>
+      <div class="viz-cap">Positive = overweight · Negative = underweight · ±2pp tolerance</div>
+    </div>
+  </div>
+
+  <!-- Holdings table -->
+  <h3>Holdings (17 positions)</h3>
+  <div class="infobox rust" style="margin-bottom:12px;">
+    <strong>IPS Breach:</strong> Seven positions exceed the 5% single-name limit.
+    Emirates REIT (8.33%), Investor AB (7.50%), Jabal Omar (6.67%) are the most severe.
+    Broad ETFs/funds are exempt per IPS.
+  </div>
+  <div class="table-wrap">
+    <table id="holdings-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Ticker</th>
+          <th>Asset Class</th>
+          <th>Market Value (MSEK)</th>
+          <th>% AUM</th>
+          <th>YTD Return</th>
+          <th>FX</th>
+        </tr>
+      </thead>
+      <tbody id="holdings-tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══ SECTION 2 — OPPORTUNITIES / SIGNALS ═══ -->
+<section id="s-opps">
+  <div class="section-eyebrow">02 · Signals &amp; Opportunities</div>
+  <h2>What the system flagged</h2>
+
+  <div id="opps-cards"></div>
+</section>
+
+<!-- ═══ SECTION 3 — WEEKEND CHANGES ═══ -->
+<section id="s-weekend">
+  <div class="section-eyebrow">03 · Weekend Intelligence</div>
+  <h2>What changed this weekend</h2>
+
+  <div id="weekend-items"></div>
+
+  <!-- Macro radar -->
+  <div class="viz-grid" style="margin-top:18px;">
+    <div class="viz-card full">
+      <div class="viz-title">Macro Signal Radar</div>
+      <div class="viz-sub">Portfolio risk dimensions — weekend snapshot · illustrative index</div>
+      <div class="chart" id="chart-radar" style="height:340px;"></div>
+      <div class="viz-cap">Derived from portfolio exposure and weekend news signals · demo series</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 4 — THREE NBAs ═══ -->
+<section id="s-nba">
+  <div class="section-eyebrow">04 · Next-Best Actions</div>
+  <h2>Three recommended actions</h2>
+
+  <div class="infobox amber" style="margin-bottom:6px;">
+    <strong>Static snapshot:</strong> HITL buttons below are disabled.
+    To approve, edit, regenerate, or reject actions, use the live demo at
+    <a href="https://alimpolat-nordea-awm-poc.hf.space" target="_blank" rel="noopener">alimpolat-nordea-awm-poc.hf.space</a>.
+  </div>
+
+  <div id="nba-cards"></div>
+</section>
+
+<!-- ═══ SECTION 5 — RISK FLAGS ═══ -->
+<section id="s-risk">
+  <div class="section-eyebrow">05 · Risk Flags</div>
+  <h2>Flags requiring attention</h2>
+  <div id="risk-cards"></div>
+</section>
+
+<!-- ═══ SECTION 6 — AFTER-MEETING CAPTURE ═══ -->
+<section id="s-meeting">
+  <div class="section-eyebrow">06 · After-Meeting Capture</div>
+  <h2>Post-meeting notes</h2>
+
+  <div class="infobox" style="margin-bottom:12px;">
+    <strong>Note capture is disabled in static snapshot.</strong>
+    Use the live demo to log meeting outcomes, decisions, and follow-ups directly into the advisor CRM workflow.
+  </div>
+
+  <div class="meeting-note">
+    <div class="mn-label">Meeting notes · 2026-06-01 · Bergström Family Office</div>
+    <textarea disabled placeholder="Meeting notes — available in the live demo at alimpolat-nordea-awm-poc.hf.space">Key topics discussed:
+1. SEK FX floor breach — critical IPS compliance issue (35% vs 60% minimum).
+2. Trim plan for US Tech and Gulf RE overweights.
+3. Green bond reallocation timing and EU Green Bond Standard.
+
+Decisions: [pending — use live demo to record]
+Follow-up: [pending — use live demo to record]</textarea>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <span>Nordea AWM AI POC · Static Fallback Brief · 2026-06-01</span>
+  <span>Bergström Family Office · SEK 480M · intel_mode: snapshot</span>
+  <span>Live demo: <a href="https://alimpolat-nordea-awm-poc.hf.space" target="_blank">alimpolat-nordea-awm-poc.hf.space</a></span>
+</footer>
+
+</div><!-- .sheet -->
+
+<!-- ════════════════════════════════════════
+     INLINE DATA + RENDER LOGIC
+     ════════════════════════════════════════ -->
+<script>
+/* ── Inlined data from data/brief_cache_bergstrom.json ── */
+const BRIEF = {
+  "client_id": "bergstrom",
+  "generated_at": "2026-05-26T06:26:38.151163Z",
+  "intel_mode": "snapshot",
+  "opportunities": [
+    {
+      "trigger_type": "drift",
+      "asset_class": "US tech",
+      "magnitude": 5.0,
+      "confidence": "high",
+      "suggested_topic": "Review current overweight in US tech, which is 5% above the target allocation.",
+      "evidence_refs": [
+        {"doc_id": "bergstrom_portfolio_q1_2026"},
+        {"doc_id": "bergstrom_ips"}
+      ]
+    },
+    {
+      "trigger_type": "drift",
+      "asset_class": "Gulf real estate",
+      "magnitude": 5.0,
+      "confidence": "high",
+      "suggested_topic": "Address the significant overweight in Gulf real estate, currently 5% above its target allocation.",
+      "evidence_refs": [
+        {"doc_id": "bergstrom_portfolio_q1_2026"},
+        {"doc_id": "bergstrom_ips"}
+      ]
+    },
+    {
+      "trigger_type": "ips_violation",
+      "asset_class": "Multi-Asset",
+      "magnitude": -25.0,
+      "confidence": "high",
+      "suggested_topic": "Critical breach of the IPS FX policy: SEK base currency exposure is at 35.0%, significantly below the 60% minimum floor.",
+      "evidence_refs": [
+        {"doc_id": "bergstrom_ips"},
+        {"doc_id": "bergstrom_portfolio_q1_2026"}
+      ]
+    }
+  ],
+  "weekend_changes": [
+    {
+      "headline": "War puts brakes on UAE realty boom as Dubai projects face delays.",
+      "source_uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHzA_HeWoYVgBZB4ENYYI7zsjRP5CEHOr5JUJyz8FAxIMljTSpiz_8hRPbmIYrLLI1asLDkSScKtc4hOSHpeL70lTt-F2kFSFUSmGzWXH9BtxA79jrstutuSNE9_gGQCJKZBi4s9S6UU3U_Y3Bg1tO3VAC9Lw_KzCfl15rOG6yZxEIFDqFsMfJOHnhEKDodPkNEYfpf5dUQXomh652acVJ7K_lCy-kzb7jKKAywFOPqtUoOq-14QReS2-lllCk=",
+      "ts": "2026-05-26T00:00:00Z",
+      "relevance_tag": "gulf_real_estate"
+    },
+    {
+      "headline": "Saudi property market posts strong Q1 growth with $30 billion in deals.",
+      "source_uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGVlxR80S8mg5wITjPADGsWu2iqLm749SJ18Y3q5WxaX94TLcNe2uJZGuX5E4KyzsLIMfvJKloN8WLyrSkclKS6OPiwYk834ioDhNTiy33-aa5LbW7mLtCgzXYB9PByXkSqETXIshvBlE2PFMxpBA4J4QKpGKGkQzkMxYoZznW3Yn5jiaglamwC_0nKha2yiM0ehW3l7e4XYQVNw5bjQGlmAU-wTg38eFYxA7o=",
+      "ts": "2026-05-26T00:00:00Z",
+      "relevance_tag": "gulf_real_estate"
+    },
+    {
+      "headline": "EU Green Bond Standard: 2026 Regulation, Timeline & FAQ.",
+      "source_uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH6eW9S29ZvWuRhjlzhLeAH5lvajS1i4ujjXKsacVbF7RHEm1qkqCMLbDBPZvqTi49F9CcGb3tKc1_MRy7DVpGmk15dpjwkR_rQdLL73f6sMLF8dOymuy37B3Z-kiMhTwb6hEeXc3N1vq89gi6gN7e6swKn31J2aIhtLgB37hhUzqorQDBxlKrLBmqAALz0sUhdzW5D66U=",
+      "ts": "2026-05-26T00:00:00Z",
+      "relevance_tag": "green_bonds"
+    }
+  ],
+  "three_nbas": [
+    {
+      "title": "Fix Critical SEK FX Floor Breach (35% vs 60% Min)",
+      "rationale": "The portfolio is in critical breach of its Investment Policy Statement, with SEK base currency exposure at 35% against a mandatory 60% minimum. This represents a significant unhedged currency risk. This action is the highest priority for immediate IPS compliance.",
+      "projected_impact": "Realigns the portfolio with its core risk parameter, significantly reduces currency risk, and brings the portfolio back into compliance with the IPS FX floor.",
+      "confidence": "high",
+      "evidence_refs": [
+        {"doc_id": "bergstrom_ips", "excerpt": "FX policy: a minimum of 60% SEK base-currency exposure across the total book."},
+        {"doc_id": "bergstrom_portfolio_q1_2026"}
+      ],
+      "computation_trace": "SEK base share = Σ(mv where fx_exposure='SEK') / AUM = SEK 168,000,000 / SEK 480,000,000 = 35.00% (floor=60% → BREACH)",
+      "suggested_priority": "primary"
+    },
+    {
+      "title": "Trim Overweights in US Tech, Gulf RE & Breached Single Stocks",
+      "rationale": "The portfolio has two 5pp overweights (US Tech at 20%, Gulf RE at 15%) and seven single-position breaches of the 5% AUM limit (e.g., Emirates REIT at 8.33%, Investor AB at 7.50%). Trimming these positions is required for IPS compliance, aligns with the client's stated concerns about valuations and concentration, and generates capital to fix the SEK FX breach.",
+      "projected_impact": "Reduces concentration risk, realigns the portfolio with IPS targets, and generates capital for rebalancing into underweight positions and increasing SEK exposure.",
+      "confidence": "high",
+      "evidence_refs": [
+        {"doc_id": "bergstrom_ips", "excerpt": "Single-position limit: 5% of total AUM in any single security... target_allocation: US tech=15.0%, Gulf real estate=10.0%"},
+        {"doc_id": "bergstrom_portfolio_q1_2026"}
+      ],
+      "computation_trace": "Drift: Gulf real estate = 15.0% − 10.0% = +5.00pp; US tech = 20.0% − 15.0% = +5.00pp. Single-position breaches: Emirates REIT (8.33%), Investor AB (7.50%), Jabal Omar (6.67%), etc.",
+      "suggested_priority": "secondary"
+    },
+    {
+      "title": "Reallocate Capital to Green Bonds in EU Fixed Income Sleeve",
+      "rationale": "Directly addresses the client's request to increase allocation to green bonds. The EU Fixed Income sleeve is currently 5pp underweight target. Capital generated from trimming overweights can be reallocated here, improving the portfolio's ESG profile while closing an allocation gap. News on the new EU Green Bond Standard makes this a timely conversation.",
+      "projected_impact": "Fulfills a specific client objective, reduces the portfolio's allocation drift, and improves its ESG characteristics by funding a targeted, high-quality asset class.",
+      "confidence": "high",
+      "evidence_refs": [
+        {"doc_id": "bergstrom_ips", "excerpt": "target_allocation: EU fixed income=20.0%"},
+        {"doc_id": "bergstrom_portfolio_q1_2026"},
+        {"doc_id": "news_2026-05-26_EU-Green-Bond-Standard", "source_uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH6eW9S29ZvWuRhjlzhLeAH5lvajS1i4ujjXKsacVbF7RHEm1qkqCMLbDBPZvqTi49F9CcGb3tKc1_MRy7DVpGmk15dpjwkR_rQdLL73f6sMLF8dOymuy37B3Z-kiMhTwb6hEeXc3N1vq89gi6gN7e6swKn31J2aIhtLgB37hhUzqorQDBxlKrLBmqAALz0sUhdzW5D66U="}
+      ],
+      "computation_trace": "Drift: EU fixed income = 15.0% − 20.0% = -5.00pp",
+      "suggested_priority": "tertiary"
+    }
+  ],
+  "risk_flags": [
+    {
+      "kind": "fx",
+      "severity": "action",
+      "note": "Critical breach of IPS. Portfolio SEK exposure is 35%, far below the required 60% minimum. Immediate action is required to rebalance and/or hedge."
+    },
+    {
+      "kind": "concentration",
+      "severity": "action",
+      "note": "Seven single-name positions are in breach of the 5% AUM limit. Most severe are Emirates REIT (8.33%), Investor AB (7.50%), and Jabal Omar Dev Co. (6.67%). Trimming is required."
+    }
+  ]
+};
+
+/* ── Inlined data from data/client_snapshot_bergstrom.json ── */
+const CLIENT = {
+  "client_id": "bergstrom",
+  "client_name": "Bergström Family Office",
+  "aum_sek": 480000000.0,
+  "holdings": [
+    {"ticker":"INVE-B.ST","name":"Investor AB ser. B","asset_class":"Nordic equity","quantity":116000,"cost_basis":27000000,"current_mv":36000000,"ytd_return_pct":9.2,"dividend_ytd":1020000,"fx_exposure":"SEK"},
+    {"ticker":"ATCO-A.ST","name":"Atlas Copco AB ser. A","asset_class":"Nordic equity","quantity":175000,"cost_basis":24500000,"current_mv":32000000,"ytd_return_pct":7.8,"dividend_ytd":430000,"fx_exposure":"SEK"},
+    {"ticker":"VOLV-B.ST","name":"Volvo AB ser. B","asset_class":"Nordic equity","quantity":92000,"cost_basis":23000000,"current_mv":28000000,"ytd_return_pct":5.1,"dividend_ytd":1200000,"fx_exposure":"SEK"},
+    {"ticker":"HEXA-B.ST","name":"Hexagon AB ser. B","asset_class":"Nordic equity","quantity":220000,"cost_basis":22400000,"current_mv":26000000,"ytd_return_pct":6.4,"dividend_ytd":180000,"fx_exposure":"SEK"},
+    {"ticker":"ASSA-B.ST","name":"Assa Abloy AB ser. B","asset_class":"Nordic equity","quantity":72000,"cost_basis":20800000,"current_mv":24000000,"ytd_return_pct":4.7,"dividend_ytd":360000,"fx_exposure":"SEK"},
+    {"ticker":"SAND.ST","name":"Sandvik AB","asset_class":"Nordic equity","quantity":86000,"cost_basis":18900000,"current_mv":22000000,"ytd_return_pct":6.0,"dividend_ytd":550000,"fx_exposure":"SEK"},
+    {"ticker":"QQQ","name":"Invesco QQQ Trust ETF","asset_class":"US tech","quantity":52000,"cost_basis":24000000,"current_mv":36000000,"ytd_return_pct":14.1,"dividend_ytd":180000,"fx_exposure":"USD"},
+    {"ticker":"AAPL","name":"Apple Inc.","asset_class":"US tech","quantity":9500,"cost_basis":15000000,"current_mv":22000000,"ytd_return_pct":11.3,"dividend_ytd":70000,"fx_exposure":"USD"},
+    {"ticker":"MSFT","name":"Microsoft Corp.","asset_class":"US tech","quantity":4200,"cost_basis":14500000,"current_mv":22000000,"ytd_return_pct":12.6,"dividend_ytd":120000,"fx_exposure":"USD"},
+    {"ticker":"NVDA","name":"NVIDIA Corp.","asset_class":"US tech","quantity":11000,"cost_basis":7500000,"current_mv":16000000,"ytd_return_pct":22.5,"dividend_ytd":10000,"fx_exposure":"USD"},
+    {"ticker":"DE10Y-BUND","name":"German Bund 1.7% 2036","asset_class":"EU fixed income","quantity":30000,"cost_basis":28600000,"current_mv":28000000,"ytd_return_pct":-1.2,"dividend_ytd":740000,"fx_exposure":"EUR"},
+    {"ticker":"FR10Y-OAT","name":"French OAT 2.0% 2036","asset_class":"EU fixed income","quantity":21000,"cost_basis":20400000,"current_mv":20000000,"ytd_return_pct":-0.9,"dividend_ytd":620000,"fx_exposure":"EUR"},
+    {"ticker":"IEAC","name":"iShares EUR Corp Bond UCITS ETF","asset_class":"EU fixed income","quantity":165000,"cost_basis":23600000,"current_mv":24000000,"ytd_return_pct":1.4,"dividend_ytd":840000,"fx_exposure":"EUR"},
+    {"ticker":"REIT.DI","name":"Emirates REIT (Dubai commercial)","asset_class":"Gulf real estate","quantity":4200000,"cost_basis":31000000,"current_mv":40000000,"ytd_return_pct":12.8,"dividend_ytd":1900000,"fx_exposure":"AED"},
+    {"ticker":"4250.SR","name":"Jabal Omar Development Co. (Makkah)","asset_class":"Gulf real estate","quantity":1350000,"cost_basis":27000000,"current_mv":32000000,"ytd_return_pct":9.4,"dividend_ytd":600000,"fx_exposure":"SAR"},
+    {"ticker":"NORD-PE-VII","name":"Nordic Private Equity Fund VII (illiquid)","asset_class":"Alternatives","quantity":1,"cost_basis":30000000,"current_mv":44000000,"ytd_return_pct":8.0,"dividend_ytd":0,"fx_exposure":"EUR"},
+    {"ticker":"GLOB-INFRA","name":"Global Infrastructure Fund II","asset_class":"Alternatives","quantity":1,"cost_basis":22000000,"current_mv":28000000,"ytd_return_pct":5.5,"dividend_ytd":1100000,"fx_exposure":"USD"}
+  ],
+  "target_allocation": {
+    "Nordic equity": 0.35,
+    "US tech": 0.15,
+    "EU fixed income": 0.2,
+    "Gulf real estate": 0.1,
+    "Alternatives": 0.2
+  },
+  "stated_concerns": [
+    "Gulf concentration creeping above target.",
+    "US-tech valuation discomfort.",
+    "Interest in green-bond reallocation."
+  ],
+  "restrictions": [
+    "No direct fossil-fuel producers.",
+    "No direct holdings in upstream oil, gas, or coal extraction companies.",
+    "ESG-screened equity.",
+    "Single-name equity must pass Nordea's ESG screen (no controversial weapons, no UN Global Compact violators).",
+    "Single position ≤ 5% of AUM in any single security (funds and broad ETFs exempt).",
+    "Minimum of 60% SEK base-currency exposure across the total book.",
+    "At least 5% of holdings must be realisable within five business days."
+  ],
+  "last_meeting_date": "2026-04-14"
+};
+
+/* ════════════════════════
+   RENDER HELPERS
+   ════════════════════════ */
+
+// Format SEK
+function fmtMSEK(v) { return (v/1e6).toFixed(1) + ' MSEK'; }
+function fmtPct(v)   { return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; }
+
+// Palette map
+const PALETTE = {
+  'Nordic equity':   '#788C5D',
+  'US tech':         '#D97757',
+  'EU fixed income': '#C7A35F',
+  'Gulf real estate':'#B04A3F',
+  'Alternatives':    '#87867F'
+};
+const LIVE_DEMO = 'https://alimpolat-nordea-awm-poc.hf.space';
+
+/* ── Top banner gen-ts ── */
+(function(){
+  const d = new Date(BRIEF.generated_at);
+  document.getElementById('gen-ts').textContent =
+    'Generated ' + d.toISOString().replace('T',' ').slice(0,19) + ' UTC';
+})();
+
+/* ── Intel mode badge ── */
+(function(){
+  const el = document.getElementById('intel-mode-badge');
+  if(el) el.textContent = BRIEF.intel_mode;
+})();
+
+/* ── Concerns + restrictions chips ── */
+(function(){
+  const cc = document.getElementById('concerns-chips');
+  if(cc) CLIENT.stated_concerns.forEach(c => {
+    const s = document.createElement('span');
+    s.className = 'chip'; s.textContent = c; cc.appendChild(s);
+  });
+  const rc = document.getElementById('restrictions-chips');
+  if(rc) CLIENT.restrictions.forEach(r => {
+    const s = document.createElement('span');
+    s.className = r.toLowerCase().includes('breach') || r.toLowerCase().includes('minimum') ? 'chip red' : 'chip';
+    s.textContent = r; rc.appendChild(s);
+  });
+})();
+
+/* ── Holdings table ── */
+(function(){
+  const tbody = document.getElementById('holdings-tbody');
+  if(!tbody) return;
+  const AUM = CLIENT.aum_sek;
+  // ETF/fund tickers exempt from single-name limit
+  const etfExempt = ['QQQ','IEAC','NORD-PE-VII','GLOB-INFRA'];
+  CLIENT.holdings.forEach(h => {
+    const pct = (h.current_mv / AUM) * 100;
+    const breach = !etfExempt.includes(h.ticker) && pct > 5;
+    const tr = document.createElement('tr');
+    if(breach) tr.className = 'breach';
+    tr.innerHTML = `
+      <td>${h.name}${breach ? '<span class="breach-tag">IPS BREACH</span>' : ''}</td>
+      <td class="mc">${h.ticker}</td>
+      <td>${h.asset_class}</td>
+      <td class="num">${fmtMSEK(h.current_mv)}</td>
+      <td class="num ${breach ? 'neg' : ''}">${pct.toFixed(1)}%</td>
+      <td class="num ${h.ytd_return_pct >= 0 ? 'pos' : 'neg'}">${fmtPct(h.ytd_return_pct)}</td>
+      <td class="mc">${h.fx_exposure}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+})();
+
+/* ── Opportunities cards ── */
+(function(){
+  const container = document.getElementById('opps-cards');
+  if(!container) return;
+  const TRIGGER_LABEL = { drift: 'Drift Signal', ips_violation: 'IPS Violation', macro: 'Macro Trigger' };
+  const TRIGGER_CLASS = { drift: 'amber', ips_violation: 'rust', macro: 'clay' };
+  BRIEF.opportunities.forEach(op => {
+    const cls = TRIGGER_CLASS[op.trigger_type] || 'clay';
+    const lbl = TRIGGER_LABEL[op.trigger_type] || op.trigger_type;
+    const mag = op.magnitude >= 0 ? '+' + op.magnitude.toFixed(1) : op.magnitude.toFixed(1);
+    const div = document.createElement('div');
+    div.className = `infobox ${cls}`;
+    div.innerHTML = `
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap;">
+        <span class="pill ${cls}">${lbl}</span>
+        <span class="pill gray">${op.asset_class}</span>
+        <span class="conf ${op.confidence}">${op.confidence}</span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--gray-700);margin-left:auto;">magnitude: <strong>${mag}pp</strong></span>
+      </div>
+      <strong>${op.suggested_topic}</strong>
+    `;
+    container.appendChild(div);
+  });
+})();
+
+/* ── Weekend changes ── */
+(function(){
+  const container = document.getElementById('weekend-items');
+  if(!container) return;
+  const TAG_LABEL = { gulf_real_estate: 'Gulf RE', green_bonds: 'Green Bonds', macro: 'Macro' };
+  const TAG_CLS   = { gulf_real_estate: 'clay', green_bonds: 'olive', macro: 'amber' };
+  BRIEF.weekend_changes.forEach(wc => {
+    const tag = wc.relevance_tag || 'macro';
+    const lbl = TAG_LABEL[tag] || tag;
+    const cls = TAG_CLS[tag] || 'clay';
+    const d = document.createElement('div');
+    d.className = 'wc-item';
+    d.innerHTML = `
+      <div class="wc-tag"><span class="pill ${cls}">${lbl}</span></div>
+      <div class="wc-body">
+        <div class="wc-headline">${wc.headline}</div>
+        <div class="wc-meta">
+          ${new Date(wc.ts).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}
+          &nbsp;·&nbsp;
+          ${wc.source_uri
+            ? `<a href="${wc.source_uri}" target="_blank" rel="noopener">Source ↗</a>`
+            : 'No source'}
+        </div>
+      </div>
+    `;
+    container.appendChild(d);
+  });
+})();
+
+/* ── NBA cards ── */
+(function(){
+  const container = document.getElementById('nba-cards');
+  if(!container) return;
+  BRIEF.three_nbas.forEach((nba, idx) => {
+    const div = document.createElement('div');
+    div.className = 'nba-card';
+    // evidence refs
+    const refs = (nba.evidence_refs || []).map(r => {
+      const uri = r.source_uri ? ` <a href="${r.source_uri}" target="_blank" rel="noopener">↗</a>` : '';
+      const exc = r.excerpt ? `<span style="color:var(--gray-500);font-style:italic;"> — "${r.excerpt}"</span>` : '';
+      return `<div class="evidence-ref">· <code>${r.doc_id || '—'}</code>${exc}${uri}</div>`;
+    }).join('');
+    // projection mini chart id
+    const chartId = `chart-nba-${idx}`;
+    div.innerHTML = `
+      <div class="nba-header">
+        <div class="nba-title-block">
+          <div class="nba-badges" style="margin-bottom:8px;">
+            <span class="priority-chip ${nba.suggested_priority}"><span class="dot"></span>${nba.suggested_priority}</span>
+            <span class="conf ${nba.confidence}">${nba.confidence}</span>
+            <span style="font-family:var(--mono);font-size:10.5px;color:var(--gray-500);">NBA ${idx+1} of 3</span>
+          </div>
+          <h4>${nba.title}</h4>
+        </div>
+      </div>
+      <div class="nba-body">
+        <div class="nba-field">
+          <label>Rationale</label>
+          <p>${nba.rationale}</p>
+        </div>
+        <div class="nba-field">
+          <label>Projected Impact</label>
+          <p>${nba.projected_impact}</p>
+          <div class="viz-card" style="margin-top:10px;">
+            <div class="viz-title">Projection · illustrative</div>
+            <div class="chart" id="${chartId}" style="height:160px;"></div>
+          </div>
+        </div>
+      </div>
+      ${nba.computation_trace ? `
+      <div class="nba-trace">
+        <label>Computation Trace</label>
+        ${nba.computation_trace}
+      </div>` : ''}
+      <div class="nba-evidence">
+        <div class="nba-evidence-label">Evidence References</div>
+        ${refs}
+      </div>
+      <div class="hitl-row">
+        <span class="hitl-label">Advisor Actions:</span>
+        ${['Approve','Edit','Regenerate','Reject'].map(act => `
+          <button class="hitl-btn" disabled title="Static snapshot · use the live demo at ${LIVE_DEMO} to interact">
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+              ${act==='Approve'  ? '<polyline points="1.5,6 4.5,9 10.5,3"/>' :
+                act==='Edit'     ? '<path d="M1 9 L3 11 M9.5 1.5L10.5 2.5L2.5 10.5L1 11L1.5 9.5L9.5 1.5Z"/>' :
+                act==='Regenerate'? '<path d="M2 6a4 4 0 0 1 4-4 4 4 0 0 1 2.8 1.2M10 6a4 4 0 0 1-4 4 4 4 0 0 1-2.8-1.2"/><polyline points="10,2 10,6 6,6"/>' :
+                '<line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/>'}
+            </svg>
+            ${act}
+          </button>`).join('')}
+      </div>
+      <p class="hitl-static-note">Static snapshot — HITL controls disabled. Use the
+        <a href="${LIVE_DEMO}" target="_blank" rel="noopener">live demo</a> to interact.
+      </p>
+    `;
+    container.appendChild(div);
+  });
+})();
+
+/* ── Risk flags ── */
+(function(){
+  const container = document.getElementById('risk-cards');
+  if(!container) return;
+  BRIEF.risk_flags.forEach(rf => {
+    const div = document.createElement('div');
+    div.className = `risk-card ${rf.severity}`;
+    const icon = rf.severity === 'action'
+      ? `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#B04A3F" stroke-width="1.5"/><line x1="10" y1="5" x2="10" y2="11" stroke="#B04A3F" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14" r="1" fill="#B04A3F"/></svg>`
+      : `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#C7A35F" stroke-width="1.5"/><line x1="10" y1="5" x2="10" y2="11" stroke="#C7A35F" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14" r="1" fill="#C7A35F"/></svg>`;
+    div.innerHTML = `
+      <div class="risk-icon">${icon}</div>
+      <div class="risk-body">
+        <div class="risk-kind ${rf.severity}">${rf.kind.toUpperCase()} · ${rf.severity.toUpperCase()}</div>
+        <p>${rf.note}</p>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+})();
+
+/* ════════════════════════
+   ECHARTS — init after DOM
+   ════════════════════════ */
+window.addEventListener('DOMContentLoaded', function() {
+
+  /* ── Compute current allocations from holdings ── */
+  const AUM = CLIENT.aum_sek;
+  const acMV = {};
+  CLIENT.holdings.forEach(h => {
+    acMV[h.asset_class] = (acMV[h.asset_class] || 0) + h.current_mv;
+  });
+  const assetClasses = ['Nordic equity','US tech','EU fixed income','Gulf real estate','Alternatives'];
+  const currentPct = assetClasses.map(ac => +((acMV[ac]||0)/AUM*100).toFixed(2));
+  const targetPct  = assetClasses.map(ac => +(CLIENT.target_allocation[ac]*100).toFixed(2));
+  const driftPct   = assetClasses.map((ac,i) => +(currentPct[i]-targetPct[i]).toFixed(2));
+  const AC_COLORS  = assetClasses.map(ac => PALETTE[ac]);
+
+  /* ── CHART 1: Allocation donut (grouped bar) ── */
+  const donutEl = document.getElementById('chart-donut');
+  if(donutEl && typeof echarts !== 'undefined') {
+    const chart1 = echarts.init(donutEl, null, {renderer:'canvas'});
+    chart1.setOption({
+      animation: true, animationEasing:'cubicOut', animationDuration:900,
+      backgroundColor:'transparent',
+      tooltip:{
+        trigger:'item',
+        formatter: p => `<span style="font-family:var(--mono);font-size:12px;">${p.name}<br/><b>${p.value}%</b></span>`,
+        textStyle:{fontFamily:'Newsreader, serif',fontSize:13}
+      },
+      legend:{
+        orient:'vertical', right:0, top:'center',
+        textStyle:{fontFamily:'JetBrains Mono, monospace',fontSize:10,color:'#3D3D3A'},
+        itemWidth:12, itemHeight:12
+      },
+      series:[
+        {
+          name:'Current',
+          type:'pie',
+          radius:['38%','62%'],
+          center:['38%','50%'],
+          avoidLabelOverlap:false,
+          label:{show:false},
+          emphasis:{label:{show:true,fontSize:13,fontWeight:'bold',fontFamily:'Newsreader, serif'}},
+          data: assetClasses.map((ac,i) => ({
+            name:ac, value:currentPct[i],
+            itemStyle:{color:AC_COLORS[i]}
+          }))
+        }
+      ]
+    });
+    window.addEventListener('resize', () => chart1.resize());
+  }
+
+  /* ── CHART 2: Drift bars ── */
+  const driftEl = document.getElementById('chart-drift');
+  if(driftEl && typeof echarts !== 'undefined') {
+    const chart2 = echarts.init(driftEl, null, {renderer:'canvas'});
+    const driftColors = driftPct.map(d =>
+      Math.abs(d) < 1 ? '#788C5D' :
+      Math.abs(d) < 3 ? '#C7A35F' : '#B04A3F'
+    );
+    chart2.setOption({
+      animation:true, animationEasing:'cubicOut', animationDuration:900,
+      backgroundColor:'transparent',
+      tooltip:{
+        trigger:'axis',
+        formatter: p => `<span style="font-family:var(--mono);font-size:12px;">${p[0].name}<br/><b>${p[0].value > 0 ? '+' : ''}${p[0].value}pp</b></span>`,
+        textStyle:{fontFamily:'Newsreader, serif',fontSize:13}
+      },
+      grid:{left:'2%',right:'3%',top:'8%',bottom:'14%',containLabel:true},
+      xAxis:{
+        type:'category', data:assetClasses.map(ac=>ac.replace(' ','\n')),
+        axisLabel:{fontFamily:'JetBrains Mono, monospace',fontSize:9.5,color:'#87867F',interval:0},
+        axisLine:{lineStyle:{color:'#D1CFC5'}}, axisTick:{show:false}
+      },
+      yAxis:{
+        type:'value', name:'pp drift',
+        nameTextStyle:{fontFamily:'JetBrains Mono, monospace',fontSize:9,color:'#87867F'},
+        axisLabel:{fontFamily:'JetBrains Mono, monospace',fontSize:9,color:'#87867F',formatter:v=>v+'pp'},
+        splitLine:{lineStyle:{color:'#F0EEE6',type:'dashed'}},
+        axisLine:{show:false}
+      },
+      markLine:{symbol:'none'},
+      series:[{
+        type:'bar', data: driftPct.map((d,i) => ({value:d,itemStyle:{color:driftColors[i],borderRadius:4}})),
+        barMaxWidth:40,
+        markLine:{
+          silent:true, symbol:['none','none'],
+          data:[{yAxis:2,lineStyle:{color:'#D1CFC5',type:'dashed',width:1}},
+                {yAxis:-2,lineStyle:{color:'#D1CFC5',type:'dashed',width:1}}],
+          label:{show:false}
+        }
+      }]
+    });
+    window.addEventListener('resize', () => chart2.resize());
+  }
+
+  /* ── CHART 3: Macro radar ── */
+  const radarEl = document.getElementById('chart-radar');
+  if(radarEl && typeof echarts !== 'undefined') {
+    const chart3 = echarts.init(radarEl, null, {renderer:'canvas'});
+    // Demo-derived values: FX risk HIGH (35% vs 60% floor), Concentration HIGH,
+    // Geopolitical risk ELEVATED (UAE news), ESG alignment MEDIUM, Liquidity OK,
+    // IPS compliance LOW (two critical breaches)
+    chart3.setOption({
+      animation:true, animationEasing:'cubicOut', animationDuration:900,
+      backgroundColor:'transparent',
+      tooltip:{textStyle:{fontFamily:'Newsreader, serif',fontSize:13}},
+      legend:{
+        data:['Current','Benchmark'],
+        bottom:4, textStyle:{fontFamily:'JetBrains Mono, monospace',fontSize:10,color:'#3D3D3A'}
+      },
+      radar:{
+        indicator:[
+          {name:'FX Risk',        max:10},
+          {name:'Concentration',  max:10},
+          {name:'Geopolitical',   max:10},
+          {name:'ESG Alignment',  max:10},
+          {name:'Liquidity',      max:10},
+          {name:'IPS Compliance', max:10}
+        ],
+        center:['50%','48%'], radius:'64%',
+        axisName:{fontFamily:'JetBrains Mono, monospace',fontSize:10,color:'#3D3D3A'},
+        splitLine:{lineStyle:{color:'#D1CFC5'}},
+        splitArea:{areaStyle:{color:['#FAF9F5','#F7F4EC']}},
+        axisLine:{lineStyle:{color:'#D1CFC5'}}
+      },
+      series:[{
+        type:'radar',
+        data:[
+          {
+            name:'Current',
+            value:[8.5, 8, 7.5, 5.5, 6, 2.5],
+            itemStyle:{color:'#B04A3F'},
+            lineStyle:{color:'#B04A3F',width:2},
+            areaStyle:{color:'rgba(176,74,63,0.12)'}
+          },
+          {
+            name:'Benchmark',
+            value:[4, 4, 4, 7, 8, 8],
+            itemStyle:{color:'#788C5D'},
+            lineStyle:{color:'#788C5D',width:1.5,type:'dashed'},
+            areaStyle:{color:'rgba(120,140,93,0.07)'}
+          }
+        ]
+      }]
+    });
+    window.addEventListener('resize', () => chart3.resize());
+  }
+
+  /* ── CHARTS 4-6: NBA projection mini area charts ── */
+  // Deterministic demo series: with-action vs without-action portfolio value index
+  const NBA_SERIES = [
+    // NBA 0: SEK FX fix — immediate compliance improvement
+    { base:[100,100,100,100,100,100,100,100], action:[100,100.4,100.8,101.2,101.5,101.8,102.0,102.2] },
+    // NBA 1: Trim overweights — gradual risk reduction
+    { base:[100,99.5,99.8,100.2,100.0,99.7,100.5,100.8], action:[100,100.2,100.6,101.0,101.3,101.5,101.9,102.1] },
+    // NBA 2: Green bond reallocation — steady ESG improvement
+    { base:[100,100.1,100.1,100.0,99.9,100.2,100.3,100.4], action:[100,100.3,100.7,101.1,101.4,101.6,101.8,102.0] }
+  ];
+  const MONTHS = ['Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan'];
+  BRIEF.three_nbas.forEach((nba, idx) => {
+    const el = document.getElementById(`chart-nba-${idx}`);
+    if(!el || typeof echarts === 'undefined') return;
+    const s = NBA_SERIES[idx];
+    const c = echarts.init(el, null, {renderer:'canvas'});
+    c.setOption({
+      animation:true, animationEasing:'cubicOut', animationDuration:900,
+      backgroundColor:'transparent',
+      tooltip:{trigger:'axis',textStyle:{fontFamily:'Newsreader, serif',fontSize:12}},
+      legend:{data:['Without Action','With Action'],top:0,
+        textStyle:{fontFamily:'JetBrains Mono, monospace',fontSize:9,color:'#87867F'},
+        itemWidth:10,itemHeight:10},
+      grid:{left:'0%',right:'0%',top:'30px',bottom:'18px',containLabel:true},
+      xAxis:{
+        type:'category', data:MONTHS,
+        axisLabel:{fontFamily:'JetBrains Mono, monospace',fontSize:9,color:'#87867F'},
+        axisLine:{lineStyle:{color:'#D1CFC5'}}, axisTick:{show:false}
+      },
+      yAxis:{
+        type:'value',
+        axisLabel:{fontFamily:'JetBrains Mono, monospace',fontSize:8,color:'#87867F',formatter:v=>v.toFixed(0)},
+        splitLine:{lineStyle:{color:'#F0EEE6',type:'dashed'}},
+        axisLine:{show:false}, scale:true
+      },
+      series:[
+        {
+          name:'Without Action', type:'line', data:s.base, smooth:true,
+          lineStyle:{color:'#87867F',width:1.5,type:'dashed'},
+          itemStyle:{color:'#87867F'}, showSymbol:false,
+          areaStyle:{color:'rgba(135,134,127,0.06)'}
+        },
+        {
+          name:'With Action', type:'line', data:s.action, smooth:true,
+          lineStyle:{color:'#788C5D',width:2},
+          itemStyle:{color:'#788C5D'}, showSymbol:false,
+          areaStyle:{color:'rgba(120,140,93,0.12)'}
+        }
+      ]
+    });
+    window.addEventListener('resize', () => c.resize());
+  });
+
+  /* ── IntersectionObserver scroll-fade ── */
+  const sections = document.querySelectorAll('section');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.07 });
+  sections.forEach(s => obs.observe(s));
+});
+</script>
+</body>
+</html>

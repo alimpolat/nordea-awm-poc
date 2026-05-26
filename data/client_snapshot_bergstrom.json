@@ -1,0 +1,216 @@
+{
+  "client_id": "bergstrom",
+  "client_name": "Bergström Family Office",
+  "aum_sek": 480000000.0,
+  "holdings": [
+    {
+      "ticker": "INVE-B.ST",
+      "name": "Investor AB ser. B",
+      "asset_class": "Nordic equity",
+      "quantity": 116000.0,
+      "cost_basis": 27000000.0,
+      "current_mv": 36000000.0,
+      "ytd_return_pct": 9.2,
+      "dividend_ytd": 1020000.0,
+      "fx_exposure": "SEK"
+    },
+    {
+      "ticker": "ATCO-A.ST",
+      "name": "Atlas Copco AB ser. A",
+      "asset_class": "Nordic equity",
+      "quantity": 175000.0,
+      "cost_basis": 24500000.0,
+      "current_mv": 32000000.0,
+      "ytd_return_pct": 7.8,
+      "dividend_ytd": 430000.0,
+      "fx_exposure": "SEK"
+    },
+    {
+      "ticker": "VOLV-B.ST",
+      "name": "Volvo AB ser. B",
+      "asset_class": "Nordic equity",
+      "quantity": 92000.0,
+      "cost_basis": 23000000.0,
+      "current_mv": 28000000.0,
+      "ytd_return_pct": 5.1,
+      "dividend_ytd": 1200000.0,
+      "fx_exposure": "SEK"
+    },
+    {
+      "ticker": "HEXA-B.ST",
+      "name": "Hexagon AB ser. B",
+      "asset_class": "Nordic equity",
+      "quantity": 220000.0,
+      "cost_basis": 22400000.0,
+      "current_mv": 26000000.0,
+      "ytd_return_pct": 6.4,
+      "dividend_ytd": 180000.0,
+      "fx_exposure": "SEK"
+    },
+    {
+      "ticker": "ASSA-B.ST",
+      "name": "Assa Abloy AB ser. B",
+      "asset_class": "Nordic equity",
+      "quantity": 72000.0,
+      "cost_basis": 20800000.0,
+      "current_mv": 24000000.0,
+      "ytd_return_pct": 4.7,
+      "dividend_ytd": 360000.0,
+      "fx_exposure": "SEK"
+    },
+    {
+      "ticker": "SAND.ST",
+      "name": "Sandvik AB",
+      "asset_class": "Nordic equity",
+      "quantity": 86000.0,
+      "cost_basis": 18900000.0,
+      "current_mv": 22000000.0,
+      "ytd_return_pct": 6.0,
+      "dividend_ytd": 550000.0,
+      "fx_exposure": "SEK"
+    },
+    {
+      "ticker": "QQQ",
+      "name": "Invesco QQQ Trust ETF",
+      "asset_class": "US tech",
+      "quantity": 52000.0,
+      "cost_basis": 24000000.0,
+      "current_mv": 36000000.0,
+      "ytd_return_pct": 14.1,
+      "dividend_ytd": 180000.0,
+      "fx_exposure": "USD"
+    },
+    {
+      "ticker": "AAPL",
+      "name": "Apple Inc.",
+      "asset_class": "US tech",
+      "quantity": 9500.0,
+      "cost_basis": 15000000.0,
+      "current_mv": 22000000.0,
+      "ytd_return_pct": 11.3,
+      "dividend_ytd": 70000.0,
+      "fx_exposure": "USD"
+    },
+    {
+      "ticker": "MSFT",
+      "name": "Microsoft Corp.",
+      "asset_class": "US tech",
+      "quantity": 4200.0,
+      "cost_basis": 14500000.0,
+      "current_mv": 22000000.0,
+      "ytd_return_pct": 12.6,
+      "dividend_ytd": 120000.0,
+      "fx_exposure": "USD"
+    },
+    {
+      "ticker": "NVDA",
+      "name": "NVIDIA Corp.",
+      "asset_class": "US tech",
+      "quantity": 11000.0,
+      "cost_basis": 7500000.0,
+      "current_mv": 16000000.0,
+      "ytd_return_pct": 22.5,
+      "dividend_ytd": 10000.0,
+      "fx_exposure": "USD"
+    },
+    {
+      "ticker": "DE10Y-BUND",
+      "name": "German Bund 1.7% 2036",
+      "asset_class": "EU fixed income",
+      "quantity": 30000.0,
+      "cost_basis": 28600000.0,
+      "current_mv": 28000000.0,
+      "ytd_return_pct": -1.2,
+      "dividend_ytd": 740000.0,
+      "fx_exposure": "EUR"
+    },
+    {
+      "ticker": "FR10Y-OAT",
+      "name": "French OAT 2.0% 2036",
+      "asset_class": "EU fixed income",
+      "quantity": 21000.0,
+      "cost_basis": 20400000.0,
+      "current_mv": 20000000.0,
+      "ytd_return_pct": -0.9,
+      "dividend_ytd": 620000.0,
+      "fx_exposure": "EUR"
+    },
+    {
+      "ticker": "IEAC",
+      "name": "iShares EUR Corp Bond UCITS ETF",
+      "asset_class": "EU fixed income",
+      "quantity": 165000.0,
+      "cost_basis": 23600000.0,
+      "current_mv": 24000000.0,
+      "ytd_return_pct": 1.4,
+      "dividend_ytd": 840000.0,
+      "fx_exposure": "EUR"
+    },
+    {
+      "ticker": "REIT.DI",
+      "name": "Emirates REIT (Dubai commercial)",
+      "asset_class": "Gulf real estate",
+      "quantity": 4200000.0,
+      "cost_basis": 31000000.0,
+      "current_mv": 40000000.0,
+      "ytd_return_pct": 12.8,
+      "dividend_ytd": 1900000.0,
+      "fx_exposure": "AED"
+    },
+    {
+      "ticker": "4250.SR",
+      "name": "Jabal Omar Development Co. (Makkah)",
+      "asset_class": "Gulf real estate",
+      "quantity": 1350000.0,
+      "cost_basis": 27000000.0,
+      "current_mv": 32000000.0,
+      "ytd_return_pct": 9.4,
+      "dividend_ytd": 600000.0,
+      "fx_exposure": "SAR"
+    },
+    {
+      "ticker": "NORD-PE-VII",
+      "name": "Nordic Private Equity Fund VII (illiquid)",
+      "asset_class": "Alternatives",
+      "quantity": 1.0,
+      "cost_basis": 30000000.0,
+      "current_mv": 44000000.0,
+      "ytd_return_pct": 8.0,
+      "dividend_ytd": 0.0,
+      "fx_exposure": "EUR"
+    },
+    {
+      "ticker": "GLOB-INFRA",
+      "name": "Global Infrastructure Fund II",
+      "asset_class": "Alternatives",
+      "quantity": 1.0,
+      "cost_basis": 22000000.0,
+      "current_mv": 28000000.0,
+      "ytd_return_pct": 5.5,
+      "dividend_ytd": 1100000.0,
+      "fx_exposure": "USD"
+    }
+  ],
+  "target_allocation": {
+    "Nordic equity": 0.35,
+    "US tech": 0.15,
+    "EU fixed income": 0.2,
+    "Gulf real estate": 0.1,
+    "Alternatives": 0.2
+  },
+  "stated_concerns": [
+    "Gulf concentration creeping above target.",
+    "US-tech valuation discomfort.",
+    "Interest in green-bond reallocation."
+  ],
+  "restrictions": [
+    "No direct fossil-fuel producers.",
+    "No direct holdings in upstream oil, gas, or coal extraction companies.",
+    "ESG-screened equity.",
+    "Single-name equity must pass Nordea's ESG screen (no controversial weapons, no UN Global Compact violators).",
+    "Single position ≤ 5% of AUM in any single security (funds and broad ETFs exempt).",
+    "Minimum of 60% SEK base-currency exposure across the total book.",
+    "At least 5% of holdings must be realisable within five business days."
+  ],
+  "last_meeting_date": "2026-04-14"
+}

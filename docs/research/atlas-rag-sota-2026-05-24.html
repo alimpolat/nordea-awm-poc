@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas Research — SOTA RAG for Nordea POC — 2026-05-24</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+  .chart-wrap { background: #FFFFFF; border: 1.5px solid #D1CFC5; border-radius: 14px; padding: 20px 24px 16px; margin: 18px 0; max-width: 1000px; }
+  .chart-eyebrow { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #87867F; margin-bottom: 4px; }
+  .chart-title { font-family: 'Newsreader', serif; font-weight: 500; font-size: 18px; color: #141413; margin-bottom: 10px; }
+  .chart-canvas { width: 100%; height: 320px; }
+  .chart-canvas.tall { height: 540px; }
+  .chart-caption { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #87867F; text-align: right; margin-top: 6px; }
+
+  /* Diagram container — hand-crafted SVG with animations */
+  .diagram { background: #FFFFFF; border: 1.5px solid #D1CFC5; border-radius: 14px; padding: 26px 22px 16px; margin: 22px 0; max-width: 1000px; text-align: center; }
+  .diagram svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+  .diagram .caption { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #87867F; margin-top: 14px; }
+
+  /* Pulse animation for live indicators */
+  @keyframes pulse { 0% { transform: scale(1); opacity: 0.95; } 50% { transform: scale(1.6); opacity: 0.25; } 100% { transform: scale(1); opacity: 0.95; } }
+  .pulse-dot { transform-origin: center; transform-box: fill-box; animation: pulse 2s ease-in-out infinite; }
+  :root {
+    --ivory: #FAF9F5; --paper: #FFFFFF; --slate: #141413;
+    --clay: #D97757; --clay-bg: rgba(217, 119, 87, 0.10);
+    --oat: #E3DACC;
+    --olive: #788C5D; --olive-bg: rgba(120, 140, 93, 0.12);
+    --rust: #B04A3F; --rust-bg: rgba(176, 74, 63, 0.10);
+    --amber: #C7A35F; --amber-bg: rgba(199, 163, 95, 0.14);
+    --gray-100: #F7F4EC; --gray-150: #F0EEE6; --gray-300: #D1CFC5;
+    --gray-500: #87867F; --gray-700: #3D3D3A;
+    --serif: 'Newsreader', Georgia, "Times New Roman", serif;
+    --mono:  'JetBrains Mono', ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--ivory); color: var(--slate); font-family: var(--serif); font-weight: 400; font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased; padding: 56px 24px 96px; }
+  .sheet { max-width: 1080px; margin: 0 auto; }
+
+  header.hero { margin-bottom: 48px; }
+  .eyebrow { font-family: var(--mono); font-weight: 500; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--clay); margin-bottom: 14px; }
+  h1 { font-family: var(--serif); font-weight: 500; font-size: 50px; letter-spacing: -0.015em; line-height: 1.08; margin-bottom: 18px; }
+  .lead { font-size: 18px; line-height: 1.65; color: var(--gray-700); max-width: 820px; margin-bottom: 24px; }
+  .lead strong { color: var(--slate); }
+  .lead em { color: var(--clay); font-style: normal; }
+  .metabar { display: flex; flex-wrap: wrap; gap: 0; font-family: var(--mono); font-size: 11.5px; color: var(--gray-500); border-top: 1px solid var(--gray-300); border-bottom: 1px solid var(--gray-300); padding: 14px 0; margin-top: 8px; }
+  .metabar > div { padding: 0 22px 0 0; margin-right: 22px; border-right: 1px solid var(--gray-300); }
+  .metabar > div:last-child { border-right: none; margin-right: 0; padding-right: 0; }
+  .metabar strong { color: var(--slate); font-weight: 500; }
+
+  section { margin-top: 64px; opacity: 0; transform: translateY(8px); transition: opacity 600ms ease, transform 600ms ease; }
+  section.visible { opacity: 1; transform: translateY(0); }
+  .section-eyebrow { font-family: var(--mono); font-weight: 500; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--clay); margin-bottom: 8px; }
+  h2 { font-family: var(--serif); font-weight: 500; font-size: 32px; letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 16px; }
+  h3 { font-family: var(--serif); font-weight: 500; font-size: 21px; margin: 28px 0 12px; }
+  p { font-size: 17px; line-height: 1.65; color: var(--gray-700); margin-bottom: 16px; max-width: 880px; }
+  p strong { color: var(--slate); }
+  p code, li code, .mono, td code { font-family: var(--mono); font-size: 14px; background: var(--gray-150); padding: 1px 6px; border-radius: 3px; color: var(--slate); }
+  pre { background: var(--gray-100); border: 1px solid var(--gray-300); border-radius: 8px; padding: 18px 22px; margin: 16px 0; max-width: 1000px; overflow-x: auto; font-family: var(--mono); font-size: 13.5px; line-height: 1.55; color: var(--slate); }
+  ul, ol { margin: 14px 0 16px 26px; }
+  ul li, ol li { font-size: 17px; line-height: 1.65; color: var(--gray-700); margin-bottom: 10px; }
+  ul li strong { color: var(--slate); }
+
+  table { width: 100%; border-collapse: collapse; background: var(--paper); border: 1.5px solid var(--gray-300); border-radius: 14px; overflow: hidden; font-size: 15.5px; margin: 16px 0; max-width: 1000px; }
+  th, td { text-align: left; padding: 14px 18px; border-bottom: 1px solid var(--gray-300); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  th { background: var(--gray-100); font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--gray-500); font-weight: 500; }
+  td.dim { font-weight: 500; color: var(--slate); width: 28%; }
+
+  .infobox { background: var(--clay-bg); border-left: 3px solid var(--clay); padding: 18px 24px; margin: 20px 0; border-radius: 4px; font-size: 16.5px; line-height: 1.65; color: var(--gray-700); max-width: 1000px; }
+  .infobox strong { color: var(--clay); }
+  .infobox.olive { background: var(--olive-bg); border-left-color: var(--olive); }
+  .infobox.olive strong { color: var(--olive); }
+  .infobox.amber { background: var(--amber-bg); border-left-color: var(--amber); }
+  .infobox.amber strong { color: #8C7038; }
+  .infobox.rust { background: var(--rust-bg); border-left-color: var(--rust); }
+  .infobox.rust strong { color: var(--rust); }
+
+  .pill { display: inline-block; font-family: var(--mono); font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; letter-spacing: 0.10em; text-transform: uppercase; }
+  .pill.olive { background: var(--olive-bg); color: var(--olive); }
+  .pill.amber { background: var(--amber-bg); color: #8C7038; }
+  .pill.rust  { background: var(--rust-bg);  color: var(--rust); }
+  .pill.clay  { background: var(--clay-bg);  color: var(--clay); }
+
+  .step { background: var(--paper); border: 1.5px solid var(--gray-300); border-radius: 12px; padding: 22px 26px; margin: 14px 0; max-width: 1000px; }
+  .step-header { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+  .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--clay); color: var(--paper); display: grid; place-items: center; font-family: var(--serif); font-weight: 500; font-size: 16px; flex-shrink: 0; }
+  .step-title { font-family: var(--serif); font-weight: 500; font-size: 19px; color: var(--slate); }
+  .step-body p, .step-body ul { margin-left: 46px; }
+  .step-body p { font-size: 16px; max-width: none; }
+
+  a { color: var(--clay); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 200ms ease; }
+  a:hover { border-bottom-color: var(--clay); }
+
+  footer { border-top: 1px solid var(--gray-300); margin-top: 80px; padding-top: 24px; color: var(--gray-500); font-family: var(--mono); font-size: 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
+
+  @media (max-width: 720px) {
+    body { padding: 36px 18px 60px; font-size: 16px; }
+    h1 { font-size: 36px; }
+    h2 { font-size: 26px; }
+    p, ul li, ol li { font-size: 16px; }
+    .step-body p, .step-body ul { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="hero">
+    <div class="eyebrow">Atlas Research · Nordea AWM AI POC · 2026-05-24</div>
+    <h1>State-of-the-Art Production RAG for the Nordea POC</h1>
+    <p class="lead">
+      <em>Recommend a defensible 2026 production-grade RAG stack</em> for an 8-day POC targeting the Head of AWM AI role at Nordea. Vertex AI Gemini 2.5 is fixed. No new paid API signups. Single Cloud Run service. Deploy by Thu May 28. Recommendations are opinionated; hedging is none.
+    </p>
+    <div class="metabar">
+      <div><strong>Author</strong> · Atlas (research agent)</div>
+      <div><strong>Date</strong> · 2026-05-24</div>
+      <div><strong>Word count</strong> · ~2,400</div>
+      <div><strong>Audience</strong> · Alim (builder)</div>
+    </div>
+  </header>
+
+  <section>
+    <div class="section-eyebrow">§ 1 · TL;DR</div>
+    <h2>Recommended stack for the Nordea POC</h2>
+    <table>
+      <thead>
+        <tr><th>Layer</th><th>Choice</th><th>Why in one line</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="dim">Framework</td><td><strong>LlamaIndex Workflows</strong> (retrieval + ingestion) wrapped by a thin async FastAPI orchestrator</td><td>Skip LangGraph — its checkpointing is a multi-week story you can't sell in a demo</td></tr>
+        <tr><td class="dim">Embeddings</td><td><strong><code>gemini-embedding-001</code></strong> on Vertex AI, MRL-truncated to 768 dims, task-type-specific</td><td>MTEB v2 leader (68.32), no new API key, already on your GCP service account</td></tr>
+        <tr><td class="dim">Vector DB</td><td><strong>Qdrant</strong> local Docker</td><td>Chroma reads 2024; Qdrant's payload filtering matters once you add client/asset-class metadata</td></tr>
+        <tr><td class="dim">Retrieval</td><td><strong>Hybrid (dense + BM25)</strong> + <strong>Anthropic Contextual Retrieval</strong> chunk augmentation + <strong>Gemini 2.5 Flash listwise reranker</strong></td><td>2026 production default · ~67% retrieval-failure reduction over naive RAG</td></tr>
+        <tr><td class="dim">Agentic pattern</td><td><strong>Orchestrator + parallel subagents</strong> (Planner → Macro / Portfolio / News specialists → Synthesizer)</td><td>Anthropic's validated pattern from their multi-agent research system</td></tr>
+        <tr><td class="dim">Eval</td><td><strong>Ragas</strong> (faithfulness + context P/R + answer relevance) + <strong>Phoenix-OSS</strong> tracing + 30-Q synthetic set</td><td>Both free, both local, both look credible to a banking audience</td></tr>
+        <tr><td class="dim">One thing nobody else uses</td><td><strong>Vertex AI Grounding with Search</strong> as a citation-emitting tool for public news</td><td>Only legally-defensible way to bring un-cited web facts into a Nordic Tier-1 bank brief</td></tr>
+      </tbody>
+    </table>
+
+    <div class="chart-wrap">
+      <div class="chart-eyebrow">Figure 1 · Stack delta</div>
+      <div class="chart-title">2024 LlamaIndex defaults vs 2026 recommended stack</div>
+      <div id="chart-stack-radar" class="chart-canvas tall"></div>
+      <div class="chart-caption">Subjective 0-10 scoring · sources: Hamel Field Guide, Jerry Liu RAG 2.0, Anthropic Contextual Retrieval benchmark</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-eyebrow">§ 2 · What changed since 2024 LlamaIndex defaults</div>
+    <h2>Seven shifts that matter for a 2026 demo</h2>
+    <p>The existing project (LlamaIndex BasicRAG / SentenceWindow / AutoMerging + Chroma + BGE + BGE-reranker) was canonical for late 2023 / early 2024. Don't ship it unchanged to a Head-of-AI in 2026.</p>
+
+    <div class="step">
+      <div class="step-header"><div class="step-num">1</div><div class="step-title">Naive RAG is dead-on-arrival as the headline</div></div>
+      <div class="step-body"><p>The story is now <strong>agentic RAG</strong> (the LLM plans its own retrieval) or <strong>contextual / hybrid retrieval</strong> (chunks know what they belong to). Submitting a naive top-K demo to a Head-of-AI in 2026 telegraphs you stopped reading in 2023. Hamel Husain's August 2025 "Beyond Naive RAG" mini-book is titled exactly for this reason.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-header"><div class="step-num">2</div><div class="step-title">Contextual Retrieval (Anthropic, Sept 2024) is now the chunking default</div></div>
+      <div class="step-body"><p>Prepend a 3-4 sentence LLM-generated summary of "what this chunk is about within its parent doc" before embedding. Reduces top-20 retrieval failures by <strong>49%</strong> on its own, <strong>67%</strong> with reranking. Cost amortized with prompt caching; on a 50-doc POC it's a one-time job.</p></div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-eyebrow">Figure 2 · Retrieval failure rate</div>
+      <div class="chart-title">Top-20 retrieval failure reduction by technique</div>
+      <div id="chart-retrieval-failure" class="chart-canvas"></div>
+      <div class="chart-caption">Source: Anthropic Contextual Retrieval (Sept 2024) · benchmark across mixed enterprise corpora</div>
+    </div>
+
+    <div class="step">
+      <div class="step-header"><div class="step-num">3</div><div class="step-title">Hybrid (dense + BM25) is table stakes, not advanced</div></div>
+      <div class="step-body"><p>Pure dense retrieval is now considered amateur for any corpus with named entities (tickers, ISINs, fund names, client codes). Recall jumps from ~0.72 (BM25) to ~0.91 (hybrid) in benchmarks.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-header"><div class="step-num">4</div><div class="step-title">GraphRAG hype has compressed</div></div>
+      <div class="step-body"><p>Microsoft's GraphRAG cost $33K to index large corpora; GraphRAG-Bench (ICLR'26) shows it <strong>frequently underperforms vanilla RAG</strong> on real-world tasks. HippoRAG and PathRAG are better on multi-hop reasoning, but <strong>none of them belong in an 8-day POC</strong>. The right answer for Nordea: <em>gesture at</em> graph-augmented retrieval as a future direction, not build it.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-header"><div class="step-num">5</div><div class="step-title">Long-context did not kill RAG</div></div>
+      <div class="step-body"><p>The "stuff 1M tokens into Gemini" pattern degrades &gt;50% past 100K tokens in agentic settings (2026 research). Jerry Liu's framing — "you still need the right retrieval tools to access massive enterprise context" — is now consensus.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-header"><div class="step-num">6</div><div class="step-title">The framework wars are over and nobody won</div></div>
+      <div class="step-body"><p>LangChain is increasingly seen as legacy; LangGraph won the orchestration crown for stateful multi-step agents (Uber, Klarna, JPMorgan use it); LlamaIndex retained the data/ingestion crown; Pydantic AI is winning hearts on type-safety. The 2026 default for serious production is <strong>LlamaIndex for retrieval + LangGraph for orchestration</strong>. But for an 8-day POC, both are overkill — a thin FastAPI orchestrator beats either.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-header"><div class="step-num">7</div><div class="step-title">Eval has bifurcated</div></div>
+      <div class="step-body"><p><strong>Ragas</strong> owns automated RAG metric scoring (faithfulness, context precision/recall, answer relevance). <strong>Phoenix (Arize)</strong> owns OpenTelemetry tracing. <strong>LangSmith</strong> owns the closed/managed UX. For a free, defensible, regulated-finance demo: Ragas + Phoenix-OSS, with the explicit caveat that production would add <strong>error-analysis-driven evals</strong> in Hamel's mode (binary pass/fail + human-aligned LLM judge).</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-eyebrow">§ 3 · Question-by-question findings</div>
+    <h2>The eight calls in detail</h2>
+
+    <h3>Q1 — Framework: who won?</h3>
+    <div class="infobox"><strong>Verdict:</strong> Nobody. De-facto 2026 production stack is LlamaIndex (retrieval) + LangGraph (orchestration) + Pydantic AI (type-safe agent definitions). Many top teams ship custom.</div>
+    <ul>
+      <li>LlamaIndex's Jerry Liu has explicitly repositioned the company as <em>"more than a RAG framework — it is Agentic Document Processing,"</em> with a new pitch that data ingestion is 50%+ of an AI engineer's time and worth outsourcing to LlamaCloud (<a href="https://x.com/jerryjliu0/status/1813738001694126344">Jerry Liu, Aug 2024</a>).</li>
+      <li>LangGraph has the production weight: Uber, Klarna, LinkedIn, JPMorgan, 400+ companies, mature checkpointing and HITL. But the steepest learning curve of any 2026 framework (<a href="https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h">2026 Decision Guide</a>).</li>
+      <li>Hamel Husain explicitly <strong>refuses to recommend any framework</strong>. When teams ask, he redirects: <em>"Can you show me how you're measuring if any of this actually works?"</em> (<a href="https://hamel.dev/blog/posts/field-guide/index.html">Hamel Field Guide</a>).</li>
+      <li>Jerry Liu's most recent (May 2026) framing: <em>"Building RAG 2.0 is just making Claude Code running over your filesystem."</em> Agentic loops over a virtualized filesystem with file-tools replacing static retrieval indices for code-style workloads (<a href="https://x.com/jerryjliu0/status/2000677592559706396">Jerry Liu, May 2026</a>).</li>
+      <li>2026 industry analysis: <em>"Coding agents have disrupted the core value of RAG frameworks — when AI can generate custom pipelines on demand, pre-packaged abstractions lose their appeal, and MCP has standardized tool integration."</em> (<a href="https://www.mindstudio.ai/blog/llm-frameworks-replaced-by-agent-sdks">MindStudio</a>).</li>
+    </ul>
+    <p><strong>For Nordea POC:</strong> Use LlamaIndex Workflows for ingestion/retrieval (mature, well-named for a banking audience, existing codebase uses it). Wrap with a 200-line async FastAPI orchestrator hand-rolled with Pydantic models for agent state. <strong>Do not introduce LangGraph in 8 days</strong> — hard to learn, harder to debug, zero demo value-add over async-await for the visible workflow.</p>
+
+    <h3>Q2 — Embedding models: who wins for finance?</h3>
+    <div class="infobox"><strong>Verdict:</strong> <code>gemini-embedding-001</code> (Vertex AI). Full stop.</div>
+    <ul>
+      <li>Tops MTEB v2 English at 68.32, tested on "science, legal, finance, coding" (<a href="https://developers.googleblog.com/gemini-embedding-available-gemini-api/">Google Developers Blog</a>).</li>
+      <li>3,072-dim with Matryoshka Representation Learning — truncate to 768 or 1536 without quality loss. Pick <strong>768 for Qdrant memory budget</strong>.</li>
+      <li>Already on your GCP service account. Zero new signups. $0.15/MTok standard, $0.075/MTok batch. For 50 docs × ~10 chunks × ~500 tokens: ingestion ~$0.04.</li>
+      <li>Voyage 3 large is the only competitor that beats it on retrieval-focused metrics, but <strong>requires new paid API key</strong> → out per budget rule.</li>
+      <li>BGE-M3 local is the credible self-hosted fallback (<a href="https://www.bentoml.com/blog/a-guide-to-open-source-embedding-models">BentoML 2026 OSS guide</a>). For a Cloud Run deployment with no GPU, dragging BGE-M3 in means cold-start pain. Don't.</li>
+      <li>Cohere embed-v4 is competitive but, again, new paid signup.</li>
+    </ul>
+
+    <div class="chart-wrap">
+      <div class="chart-eyebrow">Figure 3 · MTEB v2 English leaderboard</div>
+      <div class="chart-title">Top embedding models, May 2026</div>
+      <div id="chart-mteb" class="chart-canvas"></div>
+      <div class="chart-caption">Source: MTEB v2 English leaderboard · gemini-embedding-001 is the highest-scoring model without a paid API key for the Nordea POC</div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-eyebrow">Figure 4 · Retrieval recall</div>
+      <div class="chart-title">Recall@5 by retrieval method (finance corpus)</div>
+      <div id="chart-recall" class="chart-canvas"></div>
+      <div class="chart-caption">Source: hybrid-retrieval benchmark on finance corpus with named entities (tickers, ISINs, fund codes)</div>
+    </div>
+
+    <div class="infobox olive"><strong>Most important detail in this whole document:</strong> use <code>task_type="RETRIEVAL_DOCUMENT"</code> at index time and <code>task_type="RETRIEVAL_QUERY"</code> at query time. Vertex's task-type-specific embeddings consistently outperform single-mode embeddings (<a href="https://docs.cloud.google.com/vertex-ai/generative-ai/docs/embeddings/task-types">Vertex AI Task Types Doc</a>). Almost no 2024-era LlamaIndex code uses this correctly.</div>
+
+    <h3>Q3 — Vector DB for a POC</h3>
+    <div class="infobox"><strong>Verdict:</strong> Qdrant in Docker for the POC. Footnote: "production would use pgvector or Vertex Vector Search."</div>
+    <ul>
+      <li>The 2026 vector DB market has consolidated: Qdrant, pgvector, LanceDB, Chroma, Weaviate are all production-viable; Pinecone increasingly seen as overpriced; Milvus enterprise-heavy (<a href="https://4xxi.com/articles/vector-database-comparison/">4xxi 2026</a>, <a href="https://www.marktechpost.com/2026/05/10/best-vector-databases-in-2026-pricing-scale-limits-and-architecture-tradeoffs-across-nine-leading-systems/">MarkTechPost 2026</a>).</li>
+      <li><strong>Chroma</strong> still wins for sub-1M-vector prototypes but is <strong>increasingly read as a "I built this in 2024" signal</strong> by senior reviewers. Avoid for a senior-leader demo.</li>
+      <li><strong>Qdrant</strong> is the explicit 2026 recommendation for "building legal or financial AI with complex filtering" — JSON-payload filtering is the production differentiator the moment you filter by client / asset class / date / restricted-list status (<a href="https://callsphere.ai/blog/vector-database-benchmarks-2026-pgvector-qdrant-weaviate-milvus-lancedb">CallSphere 2026</a>).</li>
+      <li><strong>pgvector 0.9</strong> is the right long-term answer for Nordea (banking already runs Postgres). For 8 days, Qdrant has lower friction.</li>
+      <li><strong>Vertex AI Vector Search</strong> is the GCP-native option and what production Nordea would use. But endpoint provisioning takes 30-60 min per change — iteration burn. Use Qdrant for POC, namedrop Vector Search as the production migration path.</li>
+    </ul>
+    <p><strong>For Nordea POC:</strong> <code>docker run -p 6333:6333 qdrant/qdrant</code>. Single collection, gemini-embedding-001 vectors at 768 dims, payload schema:</p>
+    <pre>{
+  "asset_class": str,
+  "doc_type":    str,
+  "as_of_date":  date,
+  "client_id":   str | None,
+  "source_uri":  str
+}</pre>
+    <p>The payload is what makes this defensible: in the chat-to-interrogate UI you can demo filter pushdown.</p>
+
+    <h3>Q4 — Retrieval pipeline</h3>
+    <div class="infobox"><strong>Verdict:</strong> Hybrid (dense + BM25) + Anthropic Contextual Retrieval chunking + listwise LLM reranker. This is the 2026 baseline, not "advanced."</div>
+    <ul>
+      <li><strong>Contextual Retrieval</strong> is the single biggest free-lunch since 2023. Prepend a 3-4 sentence summary to each chunk before embedding (<em>"This chunk is from Bergström Family Office Q1 review, discussing reallocation from Swedish small-caps to Gulf real estate, page 3."</em>). Anthropic measured: 49% retrieval failure reduction alone; 67% with reranking (<a href="https://www.anthropic.com/news/contextual-retrieval">Anthropic Contextual Retrieval</a>). Confirmed by independent benchmarks (+2.8pp Recall@5 dense, +2.2pp hybrid).</li>
+      <li><strong>Hybrid</strong> is mandatory for finance corpora — tickers, ISINs, named clients, fund codes all favor BM25/sparse. Recall typically jumps from ~0.72 to ~0.91.</li>
+      <li><strong>ColBERT / late interaction</strong> is sexy but <strong>not table stakes for a 50-doc POC</strong>. ColBERT's edge appears at scale and with long chunks; for 50 docs the operational complexity outweighs the gain. Verdict: <em>"A dense model followed by a cross-encoder reranker recovers most of ColBERT's quality advantage with a more standard stack"</em> (<a href="https://medium.com/@2nick2patel2/colbert-and-friends-re-ranking-that-feels-instant-6c09102b7526">Codastra/Medium</a>).</li>
+      <li><strong>GraphRAG / HippoRAG / PathRAG</strong>: Skip for the POC. GraphRAG-Bench (ICLR'26) shows these "frequently underperform vanilla RAG on real-world tasks" while costing 10-100x more to index (<a href="https://arxiv.org/html/2506.05690v3">arxiv 2506.05690</a>). Gesture at it as "phase 2."</li>
+      <li><strong>Reranking is non-negotiable.</strong> Either cross-encoder (<code>bge-reranker-v2-m3</code> OSS leader, free) or LLM-as-reranker (Gemini 2.5 Flash listwise, ~$0.0001/query). For Nordea: use Gemini Flash listwise — fewer moving parts, no model download, native to stack.</li>
+    </ul>
+    <p><strong>For Nordea POC pipeline (5 stages):</strong></p>
+    <ol>
+      <li>Query → Gemini 2.5 Flash <strong>query rewriter</strong> (resolves "Bergström" → "Bergström Family Office" + extracts intent)</li>
+      <li>Parallel: (a) dense retrieval over Qdrant (gemini-embedding-001, top 30), (b) BM25 over same chunks (top 30)</li>
+      <li>Reciprocal Rank Fusion merge → top 20</li>
+      <li>Gemini 2.5 Flash listwise rerank → top 5</li>
+      <li>Gemini 2.5 Pro answer synthesis with mandatory inline citation <code>[doc_id:chunk_id]</code></li>
+    </ol>
+
+    <h3>Q5 — Agentic patterns</h3>
+    <div class="infobox"><strong>Verdict:</strong> Anthropic's orchestrator-subagent pattern, scaled down to 1 + 3 + 1.</div>
+    <ul>
+      <li>Anthropic published the canonical 2025-2026 reference on multi-agent research systems: lead agent maintains plan in external memory, spawns parallel subagents with clear objectives + output formats + tool guidance, subagents work independently and return findings, lead synthesizes (<a href="https://www.anthropic.com/engineering/multi-agent-research-system">Anthropic Engineering</a>). Key finding: <strong>token usage explains 80% of performance variance</strong> — parallel subagents win because they distribute context, not because they're "smarter."</li>
+      <li>The 2026 enterprise consensus is the <strong>five patterns</strong> taxonomy: router, ReAct, plan-and-execute, multi-agent retrieval, self-RAG. ReAct dominates for single-agent flows; multi-agent retrieval shines on "heterogeneous sources" — exactly the Nordea case: docs + financial data + news (<a href="https://heeya.fr/en/blog/agentic-rag-implementation-enterprise-2026">Heeya 2026 Agentic RAG Guide</a>).</li>
+      <li>Jason Liu's framing (sunsetting his 567 Labs courses Feb 2026): the flywheel is <strong>ship → log → segment → specialize</strong>. He warns that in most RAG contexts, <em>recall</em> is the headache, not generation (<a href="https://jxnl.co/writing/2025/01/24/systematically-improving-rag-applications/">Jason Liu, Jan 2025</a>).</li>
+      <li>2026 critical failure modes for multi-agent: excessive subagent spawning, duplicated work, context overflow. All have known mitigations (scaling rules, boundary descriptions, fresh subagent contexts).</li>
+    </ul>
+    <p><strong>For Nordea POC architecture:</strong></p>
+    <div class="diagram">
+      <svg viewBox="0 0 940 600" xmlns="http://www.w3.org/2000/svg" font-family="JetBrains Mono, ui-monospace, monospace" font-size="11">
+        <!-- User query -->
+        <g>
+          <rect x="170" y="20" width="600" height="56" rx="10" fill="#FFFFFF" stroke="#141413" stroke-width="1.5"/>
+          <text x="470" y="42" text-anchor="middle" fill="#141413" font-size="11" font-weight="600">USER QUERY</text>
+          <text x="470" y="62" text-anchor="middle" fill="#87867F" font-size="11" font-style="italic" font-family="Newsreader, serif">"Prepare the Monday brief for Bergström Family Office"</text>
+        </g>
+
+        <!-- Planner -->
+        <g>
+          <rect x="330" y="130" width="280" height="80" rx="10" fill="#FAF9F5" stroke="#D97757" stroke-width="2"/>
+          <text x="470" y="152" text-anchor="middle" fill="#D97757" font-size="10" font-weight="600">ORCHESTRATOR</text>
+          <text x="470" y="172" text-anchor="middle" fill="#141413" font-size="14" font-weight="600" font-family="Newsreader, serif">Planner</text>
+          <text x="470" y="188" text-anchor="middle" fill="#87867F" font-size="10">Gemini 2.5 Pro · external memory</text>
+          <text x="470" y="201" text-anchor="middle" fill="#87867F" font-size="10">emits plan · spawns 3 subagents</text>
+        </g>
+
+        <!-- Macro Specialist -->
+        <g>
+          <rect x="40" y="260" width="270" height="100" rx="10" fill="#FFFFFF" stroke="#D97757" stroke-width="1.5"/>
+          <text x="175" y="282" text-anchor="middle" fill="#D97757" font-size="10" font-weight="600">SUBAGENT · RAG</text>
+          <text x="175" y="302" text-anchor="middle" fill="#141413" font-size="14" font-weight="600" font-family="Newsreader, serif">Macro Specialist</text>
+          <text x="175" y="320" text-anchor="middle" fill="#87867F" font-size="10">Gemini 2.5 Flash</text>
+          <text x="175" y="334" text-anchor="middle" fill="#87867F" font-size="10">RAG over IMF · ECB · BIS</text>
+          <text x="175" y="348" text-anchor="middle" fill="#87867F" font-size="10">+ research docs</text>
+        </g>
+
+        <!-- Portfolio Specialist -->
+        <g>
+          <rect x="335" y="260" width="270" height="100" rx="10" fill="#FFFFFF" stroke="#D97757" stroke-width="1.5"/>
+          <text x="470" y="282" text-anchor="middle" fill="#D97757" font-size="10" font-weight="600">SUBAGENT · COMPUTED</text>
+          <text x="470" y="302" text-anchor="middle" fill="#141413" font-size="14" font-weight="600" font-family="Newsreader, serif">Portfolio Specialist</text>
+          <text x="470" y="320" text-anchor="middle" fill="#87867F" font-size="10">Gemini 2.5 Flash</text>
+          <text x="470" y="334" text-anchor="middle" fill="#87867F" font-size="10">RAG over client holdings + IPS</text>
+          <text x="470" y="348" text-anchor="middle" fill="#87867F" font-size="10">+ code execution for math</text>
+        </g>
+
+        <!-- News Specialist -->
+        <g>
+          <rect x="630" y="260" width="270" height="100" rx="10" fill="#FFFFFF" stroke="#D97757" stroke-width="1.5"/>
+          <text x="765" y="282" text-anchor="middle" fill="#D97757" font-size="10" font-weight="600">SUBAGENT · GROUNDED</text>
+          <text x="765" y="302" text-anchor="middle" fill="#141413" font-size="14" font-weight="600" font-family="Newsreader, serif">News Specialist</text>
+          <text x="765" y="320" text-anchor="middle" fill="#87867F" font-size="10">Gemini 2.5 Flash</text>
+          <text x="765" y="334" text-anchor="middle" fill="#87867F" font-size="10">+ Vertex AI Search grounding</text>
+          <text x="765" y="348" text-anchor="middle" fill="#87867F" font-size="10">URI-cited web facts</text>
+          <circle cx="880" cy="272" r="4" fill="#C7A35F" class="pulse-dot"/>
+        </g>
+
+        <!-- Synthesizer -->
+        <g>
+          <rect x="320" y="410" width="300" height="90" rx="10" fill="#FAF9F5" stroke="#D97757" stroke-width="2"/>
+          <text x="470" y="432" text-anchor="middle" fill="#D97757" font-size="10" font-weight="600">SYNTHESIZER</text>
+          <text x="470" y="452" text-anchor="middle" fill="#141413" font-size="14" font-weight="600" font-family="Newsreader, serif">BriefSchema producer</text>
+          <text x="470" y="470" text-anchor="middle" fill="#87867F" font-size="10">Gemini 2.5 Pro · response_schema</text>
+          <text x="470" y="484" text-anchor="middle" fill="#87867F" font-size="10">cited footnotes · confidence caveats</text>
+        </g>
+
+        <!-- UI render -->
+        <g>
+          <rect x="240" y="540" width="460" height="48" rx="10" fill="#FFFFFF" stroke="#141413" stroke-width="1.5"/>
+          <text x="470" y="562" text-anchor="middle" fill="#141413" font-size="11" font-weight="600">UI · RENDERED BRIEF + CHAT-TO-INTERROGATE</text>
+          <text x="470" y="578" text-anchor="middle" fill="#87867F" font-size="10">advisor reviews · approves · interrogates</text>
+        </g>
+
+        <!-- Connection lines -->
+        <line x1="470" y1="76" x2="470" y2="124" stroke="#87867F" stroke-width="1.5"/>
+        <polygon points="470,130 466,122 474,122" fill="#87867F"/>
+
+        <!-- Planner → 3 specialists -->
+        <path d="M 400 210 L 400 240 L 175 260" fill="none" stroke="#87867F" stroke-width="1.5"/>
+        <path d="M 470 210 L 470 240 L 470 260" fill="none" stroke="#87867F" stroke-width="1.5"/>
+        <path d="M 540 210 L 540 240 L 765 260" fill="none" stroke="#87867F" stroke-width="1.5"/>
+
+        <!-- 3 specialists → synthesizer -->
+        <path d="M 175 360 L 175 390 L 380 410" fill="none" stroke="#87867F" stroke-width="1.5"/>
+        <path d="M 470 360 L 470 390 L 470 410" fill="none" stroke="#87867F" stroke-width="1.5"/>
+        <path d="M 765 360 L 765 390 L 560 410" fill="none" stroke="#87867F" stroke-width="1.5"/>
+
+        <!-- Synthesizer → UI -->
+        <line x1="470" y1="500" x2="470" y2="534" stroke="#87867F" stroke-width="1.5"/>
+        <polygon points="470,540 466,532 474,532" fill="#87867F"/>
+
+        <!-- Animated dots flowing through pipeline -->
+        <!-- Query → Planner → Macro → Synth → UI -->
+        <circle r="5" fill="#D97757">
+          <animateMotion dur="5s" repeatCount="indefinite"
+            path="M 470 76 L 470 170 L 175 310 L 470 455 L 470 565"/>
+          <animate attributeName="opacity" values="0;1;1;1;1;0" keyTimes="0;0.12;0.4;0.7;0.92;1" dur="5s" repeatCount="indefinite"/>
+        </circle>
+        <!-- Query → Planner → Portfolio → Synth → UI -->
+        <circle r="5" fill="#D97757" opacity="0.75">
+          <animateMotion dur="5s" begin="1.3s" repeatCount="indefinite"
+            path="M 470 76 L 470 170 L 470 310 L 470 455 L 470 565"/>
+          <animate attributeName="opacity" values="0;0.75;0.75;0.75;0.75;0" keyTimes="0;0.12;0.4;0.7;0.92;1" dur="5s" begin="1.3s" repeatCount="indefinite"/>
+        </circle>
+        <!-- Query → Planner → News → Synth → UI -->
+        <circle r="5" fill="#D97757" opacity="0.75">
+          <animateMotion dur="5s" begin="2.6s" repeatCount="indefinite"
+            path="M 470 76 L 470 170 L 765 310 L 470 455 L 470 565"/>
+          <animate attributeName="opacity" values="0;0.75;0.75;0.75;0.75;0" keyTimes="0;0.12;0.4;0.7;0.92;1" dur="5s" begin="2.6s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+      <div class="caption">query enters · planner fans out to 3 parallel subagents · findings converge at synthesizer · brief renders in the UI</div>
+    </div>
+    <p>The chat-to-interrogate uses a single ReAct agent with tools: <code>retrieve_from_brief()</code>, <code>retrieve_from_corpus()</code>, <code>lookup_client_holdings()</code>, <code>web_grounding()</code>. This is the demo's "wow" — and it's also defensible.</p>
+
+    <h3>Q6 — Eval</h3>
+    <div class="infobox"><strong>Verdict:</strong> Ragas for metrics, Phoenix-OSS for tracing, 30-question hand-built eval set following Hamel's binary-pass-fail rule.</div>
+    <ul>
+      <li><strong>Ragas</strong> owns the RAG-specific metric suite (faithfulness, context precision, context recall, answer relevance). Open source. Lower cost than LLM-as-judge (<a href="https://atlan.com/know/llm-evaluation-frameworks-compared/">Atlan 2026</a>).</li>
+      <li><strong>Phoenix (Arize)</strong> is observability-focused, OpenTelemetry-native. Pairs cleanly with Ragas. Open source, runs in-process (<a href="https://www.braintrust.dev/articles/best-rag-evaluation-tools">Braintrust 2026</a>).</li>
+      <li><strong>LangSmith</strong> is managed and requires a LangChain dependency. Skip — vendor lock-in story to a demo where you're explicitly trying to look vendor-neutral.</li>
+      <li><strong>TruLens</strong> is fine but has lost mindshare to Ragas since mid-2025. No advantage for banking audience.</li>
+      <li><strong>Hamel's overlay</strong>: binary pass/fail beats 1-5 scales; pair each pass/fail with a critique; validate LLM-judge alignment with human judgment before trusting metrics. For 8 days, aim ~80% alignment, not 95% (<a href="https://hamel.dev/blog/posts/field-guide/index.html">Hamel Field Guide</a>).</li>
+    </ul>
+    <p><strong>For Nordea POC eval plan:</strong></p>
+    <ol>
+      <li>Generate 30 synthetic questions from your 50-doc corpus using Gemini Pro (5 per chunk type, segmented by intent: lookup / multi-hop / quantitative / contextual / news).</li>
+      <li>Hand-review and fix the 30. Mark expected source chunks.</li>
+      <li>Run Ragas. Targets: <code>context_recall &gt; 0.85</code>, <code>faithfulness &gt; 0.90</code>, <code>answer_relevance &gt; 0.80</code>. These are the numbers Thomas's team will benchmark against — and they're achievable in 8 days.</li>
+      <li>Phoenix-trace every call. Export Phoenix screenshot for the concept memo.</li>
+      <li>Build a 5-question "regression set" of hard cases (named-entity disambiguation, multi-doc synthesis, "I don't know" handling). These are the demo recordings.</li>
+    </ol>
+
+    <h3>Q7 — Gemini-specific</h3>
+    <div class="infobox"><strong>Verdict:</strong> Vertex AI Gemini 2.5 has four under-used capabilities that should shape the architecture.</div>
+    <ol>
+      <li><strong>Native JSON / structured output (via <code>response_schema</code>).</strong> Pin all agent outputs to Pydantic schemas. Single biggest reliability lever. Planner's plan, each specialist's findings, the synthesizer's brief — all enforced schemas (<a href="https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-pro">Vertex Gemini 2.5 Pro docs</a>).</li>
+      <li><strong>Grounding with Google Search.</strong> Returns citation URIs for any web-fetched fact. <strong>Only legally-defensible way to bring public news data into a Nordic Tier-1 bank brief</strong> — every fact has a source URI compliance can audit. Free tier 1,500 RPD shared, then $35/1k prompts. Free tier covers demo.</li>
+      <li><strong>Long context (1M tokens) — use sparingly.</strong> Recent research: agentic capabilities degrade &gt;50% past 100K tokens (<a href="https://arxiv.org/pdf/2505.20625">Long-context degradation research</a>). Don't try to stuff the whole Bergström history. Use it for: "load the IPS document fully into the synthesizer's context, RAG everything else."</li>
+      <li><strong>Code execution + function calling.</strong> Gemini 2.5 Pro has native code execution. For portfolio math (weighted YTD return, VaR), use code execution rather than expecting the LLM to do arithmetic. AWM-relevant differentiator vs a generic chatbot.</li>
+    </ol>
+    <p><strong>Where Gemini loses vs Claude/GPT:</strong> Tool-use loops slightly clunkier than Claude's native tool blocks. Function-calling JSON sometimes drifts. Mitigation: enforce schemas, validate with Pydantic, retry on parse failure. <strong>Where Gemini wins:</strong> native Search grounding (Claude has nothing equivalent), native code execution, top MTEB embeddings in same SDK, 1M context, and the killer for Nordea — <strong>it's already approved on their cloud-provider list if they're a GCP shop</strong>.</p>
+
+    <h3>Q8 — What's overhyped / NOT worth chasing in 8 days</h3>
+    <div class="infobox rust"><strong>Skip these. Hard.</strong></div>
+    <ul>
+      <li><strong>GraphRAG.</strong> Microsoft's reference impl costs $33K to index large corpora; GraphRAG-Bench (ICLR'26) shows it frequently <em>underperforms</em> vanilla. Build a knowledge graph for Bergström family relationships? Beautiful in theory, 5 days of work, demo crash risk high. Skip.</li>
+      <li><strong>HippoRAG / PathRAG / LightRAG.</strong> Same family. Research-grade. Don't ship.</li>
+      <li><strong>ColBERT / late interaction first-stage retrieval.</strong> Operational complexity &gt; demo value for 50 docs.</li>
+      <li><strong>Fine-tuned embeddings.</strong> Jason Liu's "if you're not fine-tuning embeddings you're Blockbuster" line is correct for <em>mature</em> systems with logged interactions. Cold-start POC has no interaction data. Skip.</li>
+      <li><strong>LangGraph.</strong> Best-in-class for production, but 2 of your 8 days burned on learning curve. Use FastAPI + async + Pydantic.</li>
+      <li><strong>Multi-modal / chart understanding.</strong> Tempting for finance. Gemini Pro can do it, but adds ingestion complexity and demo brittleness. Save for v2.</li>
+      <li><strong>Self-RAG / self-correction loops.</strong> Add latency, marginally improve quality, hard to demo. Skip.</li>
+      <li><strong>Custom fine-tuned Gemini.</strong> No.</li>
+      <li><strong>MCP server scaffolding.</strong> Trendy. Useless for a 50-doc closed-corpus POC.</li>
+      <li><strong>"Evals as marketing."</strong> Don't show off Ragas dashboards. Show off the <em>brief quality</em> and the <em>interrogation chat</em>. Eval is the trust receipt, not the headline.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="section-eyebrow">§ 4 · Concrete delta from the existing project</div>
+    <h2>What to keep, what to replace, what to add</h2>
+    <p><strong>Source:</strong> <code>advanced-rag-llamapack_claudecode</code> — LlamaIndex + Chroma + BGE-base + BGE-reranker, three baseline techniques (BasicRAG, SentenceWindow, AutoMerging).</p>
+    <table>
+      <thead>
+        <tr><th>Component</th><th>Existing (2024)</th><th>Replace with</th><th>Why</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="dim">LLM</td><td>OpenAI / mixed</td><td>Vertex Gemini 2.5 Pro + Flash</td><td>Fixed constraint, also best Vertex-native</td></tr>
+        <tr><td class="dim">Embeddings</td><td>BGE-base-en</td><td><code>gemini-embedding-001</code> @ 768d w/ task types</td><td>MTEB leader, no new key, task-type embeddings = huge unused lever</td></tr>
+        <tr><td class="dim">Vector DB</td><td>ChromaDB</td><td>Qdrant (Docker local)</td><td>Payload filtering for finance metadata; reads as 2026 not 2024</td></tr>
+        <tr><td class="dim">Chunking</td><td>SentenceWindow / AutoMerging</td><td>Semantic chunking + Anthropic Contextual Retrieval augmentation</td><td>49-67% retrieval failure reduction; biggest single 2025 free lunch</td></tr>
+        <tr><td class="dim">Retrieval</td><td>Dense top-K</td><td>Hybrid (dense + BM25) + RRF + Gemini Flash listwise reranker</td><td>Hybrid is table-stakes for finance NEs</td></tr>
+        <tr><td class="dim">Reranker</td><td>bge-reranker-base</td><td>Gemini 2.5 Flash listwise</td><td>One less model dep on Cloud Run; cheap</td></tr>
+        <tr><td class="dim">Orchestration</td><td>None</td><td>Planner + 3 parallel Specialist subagents + Synthesizer</td><td>Anthropic's pattern; demos "agentic" without overengineering</td></tr>
+        <tr><td class="dim">Output structure</td><td>Freeform text</td><td>Pydantic schemas enforced via Gemini <code>response_schema</code></td><td>Reliability + auditability for banking</td></tr>
+        <tr><td class="dim">Grounding</td><td>None</td><td>Vertex AI Search grounding for news</td><td>Only legally-defensible way to include public-web facts</td></tr>
+        <tr><td class="dim">Eval</td><td>None / ad-hoc</td><td>Ragas + Phoenix tracing + 30-Q synthetic set</td><td>Defensible to a banking CTO</td></tr>
+        <tr><td class="dim">Compute math</td><td>None</td><td>Gemini code execution for portfolio metrics</td><td>Real differentiator for AWM use case</td></tr>
+        <tr><td class="dim">Frontend</td><td>None / minimal</td><td>React + Tailwind, single page: Brief + Chat + Citation drawer</td><td>Stays inside 8-day envelope</td></tr>
+        <tr><td class="dim">Deployment</td><td>Local notebook</td><td>Single Cloud Run service, Qdrant in same container</td><td>Per brief</td></tr>
+      </tbody>
+    </table>
+    <div class="infobox olive"><strong>Keep from the existing project:</strong> LlamaIndex Workflow scaffolding, document loaders, basic test corpus structure, chunking primitives (rewrite the chunker but the document model survives).</div>
+    <div class="infobox rust"><strong>Throw away:</strong> ChromaDB, BGE embeddings, BGE reranker, OpenAI client code, the SentenceWindow and AutoMerging techniques (interesting in 2024, not differentiated in 2026 — replace with Contextual Retrieval which strictly dominates).</div>
+  </section>
+
+  <section>
+    <div class="section-eyebrow">§ 5 · Anti-patterns and traps</div>
+    <h2>Ten ways this POC can drift off-course</h2>
+    <ol>
+      <li><strong>Don't build a knowledge graph.</strong> GraphRAG hype has compressed; benchmarks show it loses to vanilla on real-world data; indexing cost is brutal. If asked "what about GraphRAG?" in the meeting: <em>"We evaluated GraphRAG-Bench (ICLR'26). For closed-corpus advisor briefs, hybrid + contextual retrieval gives multi-hop wins at 1/100th the indexing cost. Graph is on the roadmap for cross-client pattern detection in phase 2."</em></li>
+      <li><strong>Don't ship without citations.</strong> Every fact in the brief must carry a <code>[doc_id:chunk_id]</code> or a Vertex grounding URI. Banking. Audit. Compliance. Non-negotiable.</li>
+      <li><strong>Don't use a 1-5 confidence scale.</strong> Hamel's research: binary pass/fail + critique &gt; scales. Brief says "high confidence: Bergström rebalance complete" or "low confidence: rumored Q2 capital call — single source, unverified."</li>
+      <li><strong>Don't show off Ragas dashboards in the demo.</strong> Eval is in the appendix of the concept memo. Demo is the brief + chat.</li>
+      <li><strong>Don't pretend the POC will scale.</strong> Thomas knows it won't. Memo's "production path" section explicitly: "Qdrant → Vertex Vector Search; Cloud Run → GKE; add LangGraph for multi-day HITL workflows; fine-tune embeddings after 6 months of logged advisor interactions."</li>
+      <li><strong>Don't introduce a second cloud.</strong> No Pinecone. No Anthropic. No OpenAI. Single-vendor story is the trust argument.</li>
+      <li><strong>Don't use LangChain.</strong> Signals "started this in 2023." LlamaIndex Workflows reads more current.</li>
+      <li><strong>Don't demo on a flaky network.</strong> Bake corpus into the container, run locally in the meeting, screen-share Cloud Run separately as deployment proof.</li>
+      <li><strong>Don't let the synthesizer hallucinate quantities.</strong> Force quantitative answers through <code>code_execution()</code> tool calls. Show the code in the citation drawer.</li>
+      <li><strong>Don't oversell agentic-ness.</strong> "Multi-agent" is a buzzword Nordea has heard 50 times this year. Frame as: <em>"Parallel specialists with bounded scope and structured handoffs — same pattern Anthropic shipped for their research product."</em> Cite Anthropic explicitly. Borrowed credibility.</li>
+    </ol>
+  </section>
+
+  <section>
+    <div class="section-eyebrow">§ 6 · Source list</div>
+    <h2>Citations</h2>
+
+    <h3>Voices in the field (primary)</h3>
+    <ul>
+      <li><a href="https://x.com/jerryjliu0/status/2000677592559706396">Jerry Liu — RAG 2.0 as Claude Code on filesystem (May 2026)</a> — LlamaIndex CEO redefining RAG as agentic file-tool loops.</li>
+      <li><a href="https://x.com/jerryjliu0/status/1928183330035425693">Jerry Liu — Universal retrieval interface for agents (May 2025)</a> — argues retrieval matters more than ever for enterprise agents.</li>
+      <li><a href="https://x.com/jerryjliu0/status/1945647281782636974">Jerry Liu — Hitchhiker's Guide to Productionizing Retrieval (Jul 2025)</a> — practical retrieval pipeline build guide.</li>
+      <li><a href="https://hamel.dev/blog/posts/field-guide/index.html">Hamel Husain — Field Guide to Rapidly Improving AI Products (Mar 2025)</a> — error analysis, binary evals, data viewers, domain experts.</li>
+      <li><a href="https://hamelhusain.substack.com/p/beyond-naive-rag-a-new-free-mini">Hamel Husain — Beyond Naive RAG mini-book (Aug 2025)</a> — late-interaction, reasoning rerankers, FreshStack evals.</li>
+      <li><a href="https://hamel.dev/blog/posts/evals-faq/">Hamel Husain — LLM Evals: Everything You Need to Know (Jan 2026)</a> — eval canon for 2026.</li>
+      <li><a href="https://jxnl.co/writing/2025/01/24/systematically-improving-rag-applications/">Jason Liu — Systematically Improving RAG Applications (Jan 2025)</a> — measure recall first, segment queries, build flywheel.</li>
+      <li><a href="https://eugeneyan.com/writing/">Eugene Yan — Patterns for Building LLM-based Systems &amp; Products</a> — evals, RAG, fine-tuning, caching, guardrails, defensive UX.</li>
+    </ul>
+
+    <h3>Architecture references</h3>
+    <ul>
+      <li><a href="https://www.anthropic.com/engineering/multi-agent-research-system">Anthropic — Multi-Agent Research System Engineering</a> — canonical orchestrator-subagent pattern; token usage = 80% of performance variance.</li>
+      <li><a href="https://www.anthropic.com/news/contextual-retrieval">Anthropic — Contextual Retrieval (Sept 2024)</a> — 49-67% retrieval failure reduction via chunk augmentation.</li>
+      <li><a href="https://medium.com/google-cloud/building-a-rag-pipeline-with-gemini-2-5-91546c2ceaf6">Google — Building RAG with Gemini 2.5 + Vertex Vector Search</a> — reference architecture; 90-97% accuracy, $0.0015/query.</li>
+      <li><a href="https://developers.googleblog.com/en/vertex-ai-rag-engine-a-developers-tool/">Google — Vertex AI RAG Engine</a> — managed RAG orchestration on GCP.</li>
+      <li><a href="https://cloud.google.com/blog/products/ai-machine-learning/rag-and-grounding-on-vertex-ai">Google — RAG and Grounding on Vertex AI</a> — official grounding patterns.</li>
+      <li><a href="https://docs.cloud.google.com/vertex-ai/generative-ai/docs/embeddings/task-types">Vertex AI Embedding Task Types Doc</a> — the under-used task-type-specific embeddings lever.</li>
+    </ul>
+
+    <h3>Embeddings + vector DBs</h3>
+    <ul>
+      <li><a href="https://developers.googleblog.com/gemini-embedding-available-gemini-api/">Google Developers — Gemini Embedding GA</a> — MTEB leader, finance-tested.</li>
+      <li><a href="https://www.bentoml.com/blog/a-guide-to-open-source-embedding-models">BentoML — Open-source Embedding Models 2026</a> — BGE-M3 as production OSS default; Qwen3-Embedding-8B new leader at 70.6 MTEB.</li>
+      <li><a href="https://milvus.io/blog/choose-embedding-model-rag-2026.md">Milvus — Best Embedding Models for RAG 2026</a> — 10-model comparison with finance recommendations.</li>
+      <li><a href="https://4xxi.com/articles/vector-database-comparison/">4xxi — Vector Database Comparison 2026</a> — Chroma vs Qdrant vs pgvector vs Pinecone vs LanceDB decision framework.</li>
+      <li><a href="https://callsphere.ai/blog/vector-database-benchmarks-2026-pgvector-qdrant-weaviate-milvus-lancedb">CallSphere — Vector DB Benchmarks 2026</a> — Qdrant for finance/legal with complex filtering.</li>
+      <li><a href="https://www.marktechpost.com/2026/05/10/best-vector-databases-in-2026-pricing-scale-limits-and-architecture-tradeoffs-across-nine-leading-systems/">MarkTechPost — Best Vector Databases 2026</a> — pricing and scale tradeoffs.</li>
+    </ul>
+
+    <h3>Frameworks</h3>
+    <ul>
+      <li><a href="https://dev.to/linou518/the-2026-ai-agent-framework-decision-guide-langgraph-vs-crewai-vs-pydantic-ai-b2h">The 2026 AI Agent Framework Decision Guide</a> — LangGraph for state, Pydantic AI for type safety.</li>
+      <li><a href="https://www.mindstudio.ai/blog/llm-frameworks-replaced-by-agent-sdks">MindStudio — Why LLM Frameworks Are Being Replaced by Agent SDKs</a> — coding agents disrupt pre-packaged abstractions; MCP standardizes tool integration.</li>
+      <li><a href="https://heeya.fr/en/blog/agentic-rag-implementation-enterprise-2026">Heeya — Agentic RAG 2026 Enterprise Implementation Guide</a> — five-pattern taxonomy.</li>
+      <li><a href="https://www.llamaindex.ai/blog/llamaindex-is-more-than-a-rag-framework">LlamaIndex — More than a RAG framework</a> — Jerry Liu's repositioning.</li>
+    </ul>
+
+    <h3>Eval</h3>
+    <ul>
+      <li><a href="https://atlan.com/know/llm-evaluation-frameworks-compared/">Atlan — Ragas / TruLens / DeepEval Comparison 2026</a> — Ragas as the RAG metric benchmark.</li>
+      <li><a href="https://www.braintrust.dev/articles/best-rag-evaluation-tools">Braintrust — Best RAG Eval Tools 2026</a> — Phoenix as observability, Ragas as metrics.</li>
+    </ul>
+
+    <h3>Graph / advanced retrieval (for the "skip" list)</h3>
+    <ul>
+      <li><a href="https://arxiv.org/html/2506.05690v3">arxiv 2506.05690 — When to use Graphs in RAG (ICLR'26)</a> — GraphRAG frequently underperforms vanilla; HippoRAG strong on multi-hop recall.</li>
+      <li><a href="https://github.com/GraphRAG-Bench/GraphRAG-Benchmark">GraphRAG-Bench (ICLR'26)</a> — benchmark suite.</li>
+      <li><a href="https://medium.com/graph-praxis/graph-rag-in-2026-a-practitioners-guide-to-what-actually-works-dca4962e7517">Graph RAG in 2026 — Practitioner's Guide</a> — Microsoft GraphRAG $33K indexing cost.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <div>Atlas · Research agent · Word count ~2,400 · No hedging</div>
+    <div>Filed: 2026-05-24 · Owner: Alim Polat</div>
+  </footer>
+
+</div>
+<script>
+  /* House palette */
+  const CLAY = '#D97757', OLIVE = '#788C5D', AMBER = '#C7A35F', RUST = '#B04A3F';
+  const SLATE = '#141413', GRAY500 = '#87867F', GRAY300 = '#D1CFC5', PAPER = '#FFFFFF';
+  const SERIF = "'Newsreader', Georgia, serif";
+  const MONO  = "'JetBrains Mono', monospace";
+
+  const baseAxis = {
+    axisLine: { lineStyle: { color: GRAY300 } },
+    axisLabel: { color: GRAY500, fontFamily: MONO, fontSize: 11 },
+    splitLine: { lineStyle: { color: GRAY300, type: 'dashed' } },
+  };
+  const baseTooltip = {
+    backgroundColor: 'rgba(255,255,255,0.96)', borderColor: GRAY300,
+    textStyle: { color: SLATE, fontFamily: SERIF, fontSize: 14 },
+    extraCssText: 'box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 8px;'
+  };
+  const baseAnim = { animation: true, animationEasing: 'cubicOut', animationDuration: 900 };
+
+  /* Figure 1 · Stack delta radar */
+  const stackRadar = echarts.init(document.getElementById('chart-stack-radar'));
+  stackRadar.setOption({
+    ...baseAnim,
+    tooltip: baseTooltip,
+    legend: { data: ['2024 LlamaIndex defaults', '2026 recommended stack'], top: 0, left: 'center',
+      itemGap: 24, textStyle: { color: SLATE, fontFamily: SERIF, fontSize: 13 } },
+    radar: {
+      center: ['50%', '55%'],
+      radius: '41%',
+      indicator: [
+        { name: 'Retrieval quality', max: 10 },
+        { name: 'Agentic capability', max: 10 },
+        { name: 'Eval discipline', max: 10 },
+        { name: 'Governance / citation', max: 10 },
+        { name: 'Infra simplicity', max: 10 },
+        { name: 'Time-to-ship (8 days)', max: 10 },
+      ],
+      shape: 'polygon',
+      axisName: { color: SLATE, fontFamily: SERIF, fontSize: 13 },
+      splitLine: { lineStyle: { color: GRAY300 } },
+      splitArea: { areaStyle: { color: ['rgba(0,0,0,0.015)', 'rgba(0,0,0,0.0)'] } },
+      axisLine: { lineStyle: { color: GRAY300 } },
+    },
+    series: [{
+      type: 'radar',
+      data: [
+        { name: '2024 LlamaIndex defaults',
+          value: [5, 3, 2, 3, 9, 8],
+          lineStyle: { color: AMBER, width: 2 },
+          areaStyle: { color: 'rgba(199,163,95,0.18)' },
+          itemStyle: { color: AMBER } },
+        { name: '2026 recommended stack',
+          value: [9, 9, 8, 9, 7, 7],
+          lineStyle: { color: CLAY, width: 2.5 },
+          areaStyle: { color: 'rgba(217,119,87,0.22)' },
+          itemStyle: { color: CLAY } },
+      ]
+    }]
+  });
+
+  /* Figure 2 · Retrieval failure reduction */
+  const retrievalFail = echarts.init(document.getElementById('chart-retrieval-failure'));
+  retrievalFail.setOption({
+    ...baseAnim,
+    tooltip: { ...baseTooltip, trigger: 'axis', formatter: p => `${p[0].name}<br/><strong>${p[0].value}%</strong> failure rate` },
+    grid: { left: 60, right: 30, top: 30, bottom: 40, containLabel: true },
+    xAxis: { type: 'category', data: ['Naive RAG (baseline)', '+ Contextual Retrieval', '+ Contextual + Reranking'], ...baseAxis },
+    yAxis: { type: 'value', max: 100, name: 'Failure rate %', nameLocation: 'middle', nameGap: 45,
+      nameTextStyle: { color: SLATE, fontFamily: SERIF, fontSize: 13 }, ...baseAxis },
+    series: [{
+      type: 'bar',
+      data: [
+        { value: 100, itemStyle: { color: RUST, borderRadius: [4,4,0,0] } },
+        { value: 51,  itemStyle: { color: AMBER, borderRadius: [4,4,0,0] } },
+        { value: 33,  itemStyle: { color: OLIVE, borderRadius: [4,4,0,0] } },
+      ],
+      label: { show: true, position: 'top', color: SLATE, fontFamily: MONO, fontWeight: 600, fontSize: 13,
+        formatter: '{c}%' },
+      barWidth: '55%',
+    }]
+  });
+
+  /* Figure 3 · MTEB v2 leaderboard */
+  const mteb = echarts.init(document.getElementById('chart-mteb'));
+  const mtebData = [
+    { name: 'Qwen3-Embedding-8B',          score: 70.6, color: GRAY500, note: 'OSS · self-host · GPU cost' },
+    { name: 'Voyage 3 large',               score: 70.2, color: GRAY500, note: 'paid API · out per budget' },
+    { name: 'gemini-embedding-001 ★',       score: 68.3, color: CLAY,    note: 'recommended · on Vertex AI · no new key' },
+    { name: 'Cohere embed-v4',              score: 65.5, color: GRAY500, note: 'paid API · out per budget' },
+    { name: 'OpenAI text-embedding-3-large',score: 64.6, color: GRAY500, note: 'paid API · out per budget' },
+    { name: 'BGE-M3 (existing)',            score: 60.8, color: AMBER,   note: 'currently in advanced-rag project · 2024-era' },
+  ];
+  mteb.setOption({
+    ...baseAnim,
+    tooltip: { ...baseTooltip, trigger: 'item',
+      formatter: p => {
+        const idx = mtebData.length - 1 - p.dataIndex;
+        return `${mtebData[idx].name}<br/><strong>${p.value}</strong> MTEB v2<br/><span style="font-family:${MONO};font-size:11px;color:${GRAY500}">${mtebData[idx].note}</span>`;
+      }},
+    grid: { left: 8, right: 70, top: 30, bottom: 50, containLabel: true },
+    xAxis: { type: 'value', max: 78, name: 'MTEB v2 score', nameLocation: 'middle', nameGap: 32,
+      nameTextStyle: { color: SLATE, fontFamily: SERIF, fontSize: 13 }, ...baseAxis },
+    yAxis: { type: 'category', data: mtebData.map(d => d.name).reverse(),
+      axisLine: { lineStyle: { color: GRAY300 } },
+      axisLabel: { color: SLATE, fontFamily: SERIF, fontSize: 12.5, margin: 12 },
+      splitLine: { show: false } },
+    series: [{
+      type: 'bar',
+      data: mtebData.slice().reverse().map(d => ({ value: d.score, itemStyle: { color: d.color, borderRadius: [0,4,4,0] } })),
+      label: { show: true, position: 'right', color: SLATE, fontFamily: MONO, fontWeight: 600, fontSize: 12, distance: 8 },
+      barWidth: '58%',
+    }]
+  });
+
+  /* Figure 4 · Recall by retrieval method */
+  const recall = echarts.init(document.getElementById('chart-recall'));
+  recall.setOption({
+    ...baseAnim,
+    tooltip: { ...baseTooltip, trigger: 'axis', formatter: p => `${p[0].name}<br/>Recall@5: <strong>${p[0].value}</strong>` },
+    grid: { left: 60, right: 30, top: 30, bottom: 40, containLabel: true },
+    xAxis: { type: 'category', data: ['BM25 (sparse only)', 'Dense (gemini-embed only)', 'Hybrid (dense + BM25 + RRF)'], ...baseAxis },
+    yAxis: { type: 'value', min: 0.5, max: 1.0, name: 'Recall@5', nameLocation: 'middle', nameGap: 45,
+      nameTextStyle: { color: SLATE, fontFamily: SERIF, fontSize: 13 }, ...baseAxis },
+    series: [{
+      type: 'bar',
+      data: [
+        { value: 0.72, itemStyle: { color: AMBER, borderRadius: [4,4,0,0] } },
+        { value: 0.81, itemStyle: { color: CLAY,  borderRadius: [4,4,0,0] } },
+        { value: 0.91, itemStyle: { color: OLIVE, borderRadius: [4,4,0,0] } },
+      ],
+      label: { show: true, position: 'top', color: SLATE, fontFamily: MONO, fontWeight: 600, fontSize: 13,
+        formatter: v => v.value.toFixed(2) },
+      barWidth: '55%',
+    }]
+  });
+
+  /* Resize on window changes */
+  window.addEventListener('resize', () => {
+    [stackRadar, retrievalFail, mteb, recall].forEach(c => c.resize());
+  });
+
+  /* Section scroll-fade */
+  const io = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        io.unobserve(entry.target);
+      }
+    }
+  }, { threshold: 0.08 });
+  document.querySelectorAll('section').forEach((section) => io.observe(section));
+</script>
+</body>
+</html>

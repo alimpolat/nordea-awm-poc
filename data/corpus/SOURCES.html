@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Nordea AWM POC — RAG Corpus Sources</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+body{background:#FAF9F5;color:#141413;font-family:'Newsreader',Georgia,serif;font-size:16px;line-height:1.6;max-width:900px;margin:40px auto;padding:0 24px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#D97757;margin-bottom:10px}
+h1{font-size:28px;font-weight:600;margin-bottom:4px}h2{font-size:19px;font-weight:600;margin:26px 0 10px}
+p{margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid #D1CFC5;vertical-align:top}
+th{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#87867F}
+code{font-family:'JetBrains Mono',monospace;font-size:12px}
+.meta{font-family:'JetBrains Mono',monospace;font-size:12px;color:#87867F;margin-bottom:18px}
+.pill{font-family:'JetBrains Mono',monospace;font-size:10px;padding:1px 7px;border-radius:999px}
+.ok{background:rgba(120,140,93,.16);color:#5d6e45}.pend{background:rgba(199,163,95,.18);color:#8C7038}
+.box{background:rgba(120,140,93,.10);border-left:3px solid #788C5D;padding:12px 16px;margin:16px 0;font-size:14px}
+</style></head><body>
+<div class="eyebrow">Nordea AWM AI POC · RAG corpus manifest</div>
+<h1>Corpus sources &amp; provenance</h1>
+<div class="meta">The corpus the agents retrieve over. PDFs are gitignored (large binaries); re-fetch with <code>uv run python scripts/fetch_corpus.py</code>. Client fixtures are committed HTML.</div>
+
+<div class="box">Every fact in a generated brief is cited back to one of these documents (by <code>doc_id</code>) or to a tagged World_Monitor signal. This manifest is the audit trail.</div>
+
+<h2>Client documents (fictitious · committed)</h2>
+<table>
+<thead><tr><th>doc_id</th><th>Document</th><th>Use</th></tr></thead>
+<tbody>
+<tr><td><code>bergstrom_portfolio_q1_2026</code></td><td>Bergström portfolio statement Q1 2026</td><td>Holdings, cost basis, YTD, dividends, FX, allocation drift</td></tr>
+<tr><td><code>bergstrom_ips</code></td><td>Bergström Investment Policy Statement</td><td>Targets, permitted bands, restrictions, FX policy, stated interests</td></tr>
+<tr><td><code>bergstrom_meeting_notes_2026-01-14</code></td><td>Annual review notes</td><td>2026 posture; green-bond interest first raised</td></tr>
+<tr><td><code>bergstrom_meeting_notes_2026-02-18</code></td><td>Interim check-in notes</td><td>US-tech valuation discomfort; Gulf markup</td></tr>
+<tr><td><code>bergstrom_meeting_notes_2026-04-14</code></td><td>Quarterly meeting notes (most recent)</td><td>The 3 stated concerns the May 30 brief must address</td></tr>
+</tbody>
+</table>
+
+<h2>Public macro documents (real · gitignored)</h2>
+<table>
+<thead><tr><th>Document</th><th>Publisher</th><th>Status</th><th>Source URL</th></tr></thead>
+<tbody>
+<tr><td>BIS Quarterly Review Q1 2026</td><td>BIS</td><td><span class="pill ok">fetched</span></td><td><code>bis.org/publ/qtrpdf/r_qt2603.pdf</code></td></tr>
+<tr><td>BIS Quarterly Review Q4 2025</td><td>BIS</td><td><span class="pill ok">fetched</span></td><td><code>bis.org/publ/qtrpdf/r_qt2512.pdf</code></td></tr>
+<tr><td>IMF World Economic Outlook, Apr 2026</td><td>IMF</td><td><span class="pill ok">fetched</span></td><td><code>imf.org/.../WEO/2026/April/English/text.ashx</code></td></tr>
+<tr><td>ECB Economic Bulletin 2026</td><td>ECB</td><td><span class="pill ok">fetched</span></td><td><code>ecb.europa.eu/pub/pdf/ecbu/eb202602.en.pdf</code></td></tr>
+<tr><td>Nordea Annual Report 2024</td><td>Nordea</td><td><span class="pill pend">URL pending</span></td><td>nordea.com/en/investors — drop PDF into <code>data/corpus/</code> manually</td></tr>
+</tbody>
+</table>
+
+<h2>Live intel layer (not a document)</h2>
+<p>World_Monitor finance signals are supplied at runtime by <code>app/intel/world_monitor_client.py</code>, tagged <code>live</code> or <code>snapshot</code>. See <code>data/signals_20260530.json</code> for the frozen snapshot used by the POC.</p>
+</body></html>

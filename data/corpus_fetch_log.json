@@ -1,0 +1,44 @@
+{
+  "at": 1779757460.7960362,
+  "log": [
+    {
+      "file": "bis_quarterly_2026_q1.pdf",
+      "url": "https://www.bis.org/publ/qtrpdf/r_qt2603.pdf",
+      "publisher": "BIS",
+      "use": "Cross-border capital flows; Gulf real-estate context",
+      "status": "ok",
+      "bytes": 2199504
+    },
+    {
+      "file": "bis_quarterly_2025_q4.pdf",
+      "url": "https://www.bis.org/publ/qtrpdf/r_qt2512.pdf",
+      "publisher": "BIS",
+      "use": "Prior-quarter macro/credit backdrop",
+      "status": "ok",
+      "bytes": 2038653
+    },
+    {
+      "file": "imf_weo_2026_04.pdf",
+      "url": "https://www.imf.org/-/media/Files/Publications/WEO/2026/April/English/text.ashx",
+      "publisher": "IMF",
+      "use": "Global growth/inflation outlook; rates regime",
+      "status": "ok",
+      "bytes": 8298182
+    },
+    {
+      "file": "ecb_economic_bulletin_2026.pdf",
+      "url": "https://www.ecb.europa.eu/pub/pdf/ecbu/eb202602.en.pdf",
+      "publisher": "ECB",
+      "use": "Euro-area monetary policy; EU fixed-income duration",
+      "status": "ok",
+      "bytes": 3324544
+    },
+    {
+      "file": "nordea_annual_report_2024.pdf",
+      "url": "https://www.nordea.com/en/doc/nordea-annual-report-2024.pdf",
+      "publisher": "Nordea",
+      "use": "House view; AWM product context",
+      "status": "skip_404_text/html; charset=UTF-8"
+    }
+  ]
+}

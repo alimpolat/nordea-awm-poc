@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nordea AWM POC · RAG Eval Hand Review · 2026-05-26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ivory: #FAF9F5; --paper: #FFFFFF; --slate: #141413;
+    --clay: #D97757; --clay-bg: rgba(217,119,87,0.10);
+    --oat: #E3DACC;
+    --olive: #788C5D; --olive-bg: rgba(120,140,93,0.12);
+    --rust: #B04A3F; --rust-bg: rgba(176,74,63,0.10);
+    --amber: #C7A35F; --amber-bg: rgba(199,163,95,0.14);
+    --gray-100: #F7F4EC; --gray-150: #F0EEE6; --gray-300: #D1CFC5;
+    --gray-500: #87867F; --gray-700: #3D3D3A;
+    --serif: 'Newsreader', Georgia, "Times New Roman", serif;
+    --mono: 'JetBrains Mono', ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--ivory);color:var(--slate);font-family:var(--serif);font-weight:400;font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;padding:0 24px 96px;}
+  .sheet{max-width:1080px;margin:0 auto;}
+  header.hero{padding:48px 0 32px;}
+  .eyebrow{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--clay);margin-bottom:14px;}
+  h1{font-family:var(--serif);font-weight:500;font-size:42px;letter-spacing:-0.015em;line-height:1.08;margin-bottom:14px;}
+  .lead{font-size:17px;line-height:1.65;color:var(--gray-700);max-width:840px;margin-bottom:20px;}
+  .lead strong{color:var(--slate);}
+  .metabar{display:flex;flex-wrap:wrap;gap:0;font-family:var(--mono);font-size:11.5px;color:var(--gray-500);border-top:1px solid var(--gray-300);border-bottom:1px solid var(--gray-300);padding:14px 0;margin-top:8px;}
+  .metabar>div{padding:0 22px 0 0;margin-right:22px;border-right:1px solid var(--gray-300);}
+  .metabar>div:last-child{border-right:none;margin-right:0;padding-right:0;}
+  .metabar strong{color:var(--slate);font-weight:500;}
+  section{margin-top:56px;opacity:0;transform:translateY(8px);transition:opacity 600ms ease,transform 600ms ease;}
+  section.visible{opacity:1;transform:translateY(0);}
+  .section-eyebrow{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--clay);margin-bottom:8px;}
+  h2{font-family:var(--serif);font-weight:500;font-size:28px;letter-spacing:-0.01em;line-height:1.2;margin-bottom:16px;}
+  p{font-size:16px;line-height:1.65;color:var(--gray-700);margin-bottom:12px;max-width:880px;}
+  p strong{color:var(--slate);}
+  .table-wrap{overflow-x:auto;margin:14px 0;}
+  table{width:100%;border-collapse:collapse;background:var(--paper);border:1.5px solid var(--gray-300);border-radius:14px;overflow:hidden;font-size:13.5px;}
+  th,td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--gray-300);vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  th{background:var(--gray-100);font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray-500);font-weight:500;}
+  td.mc{font-family:var(--mono);font-size:12px;color:var(--slate);}
+  td.num{font-family:var(--mono);font-size:12px;text-align:right;}
+  td.pos{color:var(--olive);}
+  td.neg{color:var(--rust);}
+  .infobox{background:var(--clay-bg);border-left:3px solid var(--clay);padding:14px 20px;margin:14px 0;border-radius:4px;font-size:15px;line-height:1.6;color:var(--gray-700);max-width:1000px;}
+  .infobox strong{color:var(--clay);}
+  .infobox.olive{background:var(--olive-bg);border-left-color:var(--olive);}
+  .infobox.olive strong{color:var(--olive);}
+  .infobox.amber{background:var(--amber-bg);border-left-color:var(--amber);}
+  .infobox.amber strong{color:#8C7038;}
+  .infobox.rust{background:var(--rust-bg);border-left-color:var(--rust);}
+  .infobox.rust strong{color:var(--rust);}
+  .pill{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 9px;border-radius:999px;letter-spacing:0.08em;text-transform:uppercase;}
+  .pill.olive{background:var(--olive-bg);color:var(--olive);}
+  .pill.amber{background:var(--amber-bg);color:#8C7038;}
+  .pill.rust{background:var(--rust-bg);color:var(--rust);}
+  .pill.clay{background:var(--clay-bg);color:var(--clay);}
+  .pill.gray{background:var(--gray-150);color:var(--gray-500);}
+  .conf{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:0.08em;margin:2px;}
+  .conf.high{background:var(--olive-bg);color:var(--olive);}
+  .conf.medium{background:var(--amber-bg);color:#8C7038;}
+  .conf.low_needs_verification{background:var(--rust-bg);color:var(--rust);}
+  .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin:20px 0;}
+  .metric-card{background:var(--paper);border:1.5px solid var(--gray-300);border-radius:14px;padding:18px 20px;}
+  .metric-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray-500);margin-bottom:6px;}
+  .metric-value{font-family:var(--mono);font-size:28px;font-weight:600;}
+  .metric-value.pass{color:var(--olive);}
+  .metric-value.fail{color:var(--rust);}
+  .metric-value.na{color:var(--gray-500);font-size:20px;}
+  .metric-target{font-family:var(--mono);font-size:10.5px;color:var(--gray-500);margin-top:4px;}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<header class="hero">
+  <div class="eyebrow">Nordea AWM AI POC · Task 5.3</div>
+  <h1>RAG Evaluation Hand Review</h1>
+  <p class="lead">
+    Two-layer evaluation of the Bergström hybrid retrieval pipeline.<br>
+    <strong>Layer 1:</strong> Deterministic recall@5 across 34 corpus questions.<br>
+    <strong>Layer 2:</strong> LLM-judged faithfulness and answer relevance via Custom Gemini Flash judge.
+  </p>
+  <div class="metabar">
+    <div><strong>Date</strong> 2026-05-26</div>
+    <div><strong>Judge</strong> custom-gemini-flash-judge</div>
+    <div><strong>Questions</strong> 35 total (34 corpus + 1 unanswerable)</div>
+    <div><strong>Top-k</strong> 5</div>
+  </div>
+</header>
+
+<!-- ── Overall Metrics ── -->
+<section>
+  <div class="section-eyebrow">Layer 1 + Layer 2</div>
+  <h2>Overall Metrics vs Targets</h2>
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-label">Recall@5</div>
+      <div class="metric-value pass">91%</div>
+      <div class="metric-target">Target ≥70% · PASS</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Faithfulness</div>
+      <div class="metric-value pass">96%</div>
+      <div class="metric-target">Target ≥90% · PASS</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Answer Relevancy</div>
+      <div class="metric-value pass">100%</div>
+      <div class="metric-target">Target ≥80% · PASS</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Context Precision</div>
+      <div class="metric-value na">N/A</div>
+      <div class="metric-target">Target ≥80%</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Context Recall</div>
+      <div class="metric-value na">N/A</div>
+      <div class="metric-target">Target ≥85%</div>
+    </div>
+  </div>
+
+  <div class="infobox amber">
+    <strong>Judge path:</strong> custom-gemini-flash-judge.
+    Faithfulness and answer relevancy measured on 34 corpus questions
+    (hard_unanswerable excluded from LLM metrics).
+  </div>
+</section>
+
+<!-- ── Recall by Intent ── -->
+<section>
+  <div class="section-eyebrow">Layer 1 · Deterministic</div>
+  <h2>Recall@5 by Intent Bucket</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>Intent</th><th>Mean Recall@5</th><th>Pass ≥70%</th>
+      </tr></thead>
+      <tbody><tr><td>contextual</td><td class="num neg">0.650</td><td class="mc">✗</td></tr>
+<tr><td>hard_currency_math</td><td class="num pos">1.000</td><td class="mc">✓</td></tr>
+<tr><td>hard_ips_violation_detection</td><td class="num pos">1.000</td><td class="mc">✓</td></tr>
+<tr><td>hard_multi_doc_synthesis</td><td class="num pos">1.000</td><td class="mc">✓</td></tr>
+<tr><td>hard_named_entity_disambiguation</td><td class="num pos">1.000</td><td class="mc">✓</td></tr>
+<tr><td>lookup</td><td class="num pos">1.000</td><td class="mc">✓</td></tr>
+<tr><td>macro_reasoning</td><td class="num pos">1.000</td><td class="mc">✓</td></tr>
+<tr><td>multi_hop</td><td class="num pos">0.800</td><td class="mc">✓</td></tr>
+<tr><td>nba_justification</td><td class="num pos">0.933</td><td class="mc">✓</td></tr>
+<tr><td>quantitative</td><td class="num pos">1.000</td><td class="mc">✓</td></tr></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── Hand Review Table ── -->
+<section>
+  <div class="section-eyebrow">Sampled Questions</div>
+  <h2>Hand Review (worst + best + unanswerable)</h2>
+  <p>8–10 questions sampled: lowest-recall rows, highest-recall rows, and the hard_unanswerable case.
+  The unanswerable case PASSES iff the answer says "I don't know" / cannot find.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th style="min-width:200px">Question / Intent</th>
+        <th style="min-width:180px">Doc IDs</th>
+        <th style="min-width:260px">Answer</th>
+        <th>Verdict</th>
+        <th style="min-width:180px">Critique</th>
+      </tr></thead>
+      <tbody>
+          <tr>
+            <td style="min-width:200px;max-width:300px">
+              <span class="pill gray">contextual</span><br>
+              <span style="font-size:13px;color:var(--gray-700)">Both the BIS and ECB 2026 reports identify a boom in AI-related investment. In light of this trend, how is the Bergström portfolio positioned, considering its current allocation to US tech is above the strategic target?</span>
+            </td>
+            <td class="mc" style="font-size:11px;max-width:180px;word-break:break-all">
+              <strong>Retrieved:</strong> bergstrom_meeting_notes_2026-02-18, bergstrom_meeting_notes_2026-04-14, bergstrom_portfolio_q1_2026<br>
+              <strong>Expected:</strong> bergstrom_ips, bergstrom_portfolio_q1_2026, bis_quarterly_2026_q1, ecb_economic_bulletin_2026<br>
+              <strong>Recall@5:</strong> 0.25
+            </td>
+            <td style="font-size:13px;max-width:280px;color:var(--gray-700)">The Bergström portfolio's US technology sleeve, which includes single-name AI exposure, is positioned above its strategic target at approximately 20% versus a 15% target. The principal and family are increasingly uncomfortable with the valuation of this sleeve, especially the AI exposure, and are &quot;uneasy about paying these multiples.&quot; While open to a partial trim, they are hesitant to sell into mo…</td>
+            <td style="min-width:90px;text-align:center"><span class="pill rust">FAIL</span></td>
+            <td style="font-size:12px;color:var(--gray-700);max-width:200px">recall@5=0.25 — missing expected docs</td>
+          </tr>
+
+          <tr>
+            <td style="min-width:200px;max-width:300px">
+              <span class="pill gray">contextual</span><br>
+              <span style="font-size:13px;color:var(--gray-700)">Given the IMF's April 2026 'Global Economy in the Shadow of War' outlook, evaluate how Bergström's current tactical overweights to US tech and Gulf real estate align with their primary IPS objective of long-term real capital preservation.</span>
+            </td>
+            <td class="mc" style="font-size:11px;max-width:180px;word-break:break-all">
+              <strong>Retrieved:</strong> ecb_economic_bulletin_2026, imf_weo_2026_04<br>
+              <strong>Expected:</strong> bergstrom_ips, bergstrom_portfolio_q1_2026, imf_weo_2026_04<br>
+              <strong>Recall@5:</strong> 0.33
+            </td>
+            <td style="font-size:13px;max-width:280px;color:var(--gray-700)">I don't know — the provided documents do not contain this information. The contexts mention the IMF's April 2026 'Global Economy in the Shadow of War' outlook, but they do not provide any details about Bergström, their investment strategies, or their IPS objectives.</td>
+            <td style="min-width:90px;text-align:center"><span class="pill rust">FAIL</span></td>
+            <td style="font-size:12px;color:var(--gray-700);max-width:200px">recall@5=0.33 — missing expected docs</td>
+          </tr>
+
+          <tr>
+            <td style="min-width:200px;max-width:300px">
+              <span class="pill gray">multi_hop</span><br>
+              <span style="font-size:13px;color:var(--gray-700)">In the February 2026 meeting notes, the principal raised concerns about valuations in US tech, particularly single-name AI exposure. Which Q1 2026 research document contains a specific analysis of financing the AI infrastructure boom?</span>
+            </td>
+            <td class="mc" style="font-size:11px;max-width:180px;word-break:break-all">
+              <strong>Retrieved:</strong> bis_quarterly_2026_q1<br>
+              <strong>Expected:</strong> bergstrom_meeting_notes_2026-02-18, bis_quarterly_2026_q1<br>
+              <strong>Recall@5:</strong> 0.50
+            </td>
+            <td style="font-size:13px;max-width:280px;color:var(--gray-700)">The BIS Quarterly Review, March 2026, contains a specific analysis of financing the AI infrastructure boom. This analysis is found in &quot;Box A: Financing the AI infrastructure boom: on- and off‑balance sheet borrowing.&quot; It details how big US tech firms, referred to as &quot;hyperscalers,&quot; fund their increased capital expenditures, largely through corporate bond markets and off-balance sheet arrangements …</td>
+            <td style="min-width:90px;text-align:center"><span class="pill rust">FAIL</span></td>
+            <td style="font-size:12px;color:var(--gray-700);max-width:200px">recall@5=0.50 — missing expected docs</td>
+          </tr>
+
+          <tr>
+            <td style="min-width:200px;max-width:300px">
+              <span class="pill gray">quantitative</span><br>
+              <span style="font-size:13px;color:var(--gray-700)">According to the investment policy, what is the single-position limit in SEK, and does the current market value of the Investor AB holding (INVE-B.ST) exceed it?</span>
+            </td>
+            <td class="mc" style="font-size:11px;max-width:180px;word-break:break-all">
+              <strong>Retrieved:</strong> bergstrom_ips, bergstrom_portfolio_q1_2026<br>
+              <strong>Expected:</strong> bergstrom_ips, bergstrom_portfolio_q1_2026<br>
+              <strong>Recall@5:</strong> 1.00
+            </td>
+            <td style="font-size:13px;max-width:280px;color:var(--gray-700)">According to the investment policy, the single-position limit is 5% of total AUM. With a total AUM of SEK 480,000,000, this limit is SEK 24,000,000. The current market value of the Investor AB holding is SEK 36,000,000. Therefore, the Investor AB holding exceeds the single-position limit.</td>
+            <td style="min-width:90px;text-align:center"><span class="pill olive">PASS</span></td>
+            <td style="font-size:12px;color:var(--gray-700);max-width:200px">recall@5=1.00, faith=1.00, relev=1.00 — all within bounds</td>
+          </tr>
+
+          <tr>
+            <td style="min-width:200px;max-width:300px">
+              <span class="pill gray">hard_multi_doc_synthesis</span><br>
+              <span style="font-size:13px;color:var(--gray-700)">Given the ECB's monetary policy stance described in the 2026 bulletin and Bergström's current European fixed-income weight, is the portfolio over- or under-positioned versus its IPS target, and by how many percentage points?</span>
+            </td>
+            <td class="mc" style="font-size:11px;max-width:180px;word-break:break-all">
+              <strong>Retrieved:</strong> bergstrom_ips, bergstrom_portfolio_q1_2026, ecb_economic_bulletin_2026<br>
+              <strong>Expected:</strong> bergstrom_ips, bergstrom_portfolio_q1_2026, ecb_economic_bulletin_2026<br>
+              <strong>Recall@5:</strong> 1.00
+            </td>
+            <td style="font-size:13px;max-width:280px;color:var(--gray-700)">Bergström's portfolio is under-positioned in European fixed income. Its current weight is 15%, while the IPS target is 20%. This results in an under-positioning of 5 percentage points. The ECB's monetary policy stance does not directly influence this calculation.</td>
+            <td style="min-width:90px;text-align:center"><span class="pill olive">PASS</span></td>
+            <td style="font-size:12px;color:var(--gray-700);max-width:200px">recall@5=1.00, faith=1.00, relev=1.00 — all within bounds</td>
+          </tr>
+
+          <tr>
+            <td style="min-width:200px;max-width:300px">
+              <span class="pill gray">hard_ips_violation_detection</span><br>
+              <span style="font-size:13px;color:var(--gray-700)">Does Bergström's current portfolio satisfy the IPS FX policy requiring at least 60% SEK base-currency exposure? What is the actual figure and by how many percentage points does it deviate from the floor?</span>
+            </td>
+            <td class="mc" style="font-size:11px;max-width:180px;word-break:break-all">
+              <strong>Retrieved:</strong> bergstrom_ips, bergstrom_meeting_notes_2026-04-14, bergstrom_portfolio_q1_2026<br>
+              <strong>Expected:</strong> bergstrom_ips, bergstrom_portfolio_q1_2026<br>
+              <strong>Recall@5:</strong> 1.00
+            </td>
+            <td style="font-size:13px;max-width:280px;color:var(--gray-700)">No, Bergström's current portfolio does not satisfy the IPS FX policy requiring a minimum of 60% SEK base-currency exposure. The total effective SEK base exposure is approximately 41%. This figure deviates from the 60% policy floor by 19 percentage points.</td>
+            <td style="min-width:90px;text-align:center"><span class="pill olive">PASS</span></td>
+            <td style="font-size:12px;color:var(--gray-700);max-width:200px">recall@5=1.00, faith=1.00, relev=1.00 — all within bounds</td>
+          </tr>
+
+          <tr>
+            <td style="min-width:200px;max-width:300px">
+              <span class="pill gray">hard_currency_math</span><br>
+              <span style="font-size:13px;color:var(--gray-700)">Summing the SEK-denominated holdings and the Nordic equity sleeve, what fraction of the SEK 480M portfolio is held in instruments denominated in SEK on a direct (non-look-through) basis?</span>
+            </td>
+            <td class="mc" style="font-size:11px;max-width:180px;word-break:break-all">
+              <strong>Retrieved:</strong> bergstrom_ips, bergstrom_portfolio_q1_2026<br>
+              <strong>Expected:</strong> bergstrom_portfolio_q1_2026<br>
+              <strong>Recall@5:</strong> 1.00
+            </td>
+            <td style="font-size:13px;max-width:280px;color:var(--gray-700)">The total portfolio value is SEK 480,000,000. Nordic equity holdings represent approximately 38% of the portfolio directly, which is identified as the direct SEK base exposure. Therefore, the fraction of the SEK 480M portfolio held in instruments denominated in SEK on a direct (non-look-through) basis, stemming from Nordic equity and other direct SEK-denominated holdings, is approximately 38%.</td>
+            <td style="min-width:90px;text-align:center"><span class="pill olive">PASS</span></td>
+            <td style="font-size:12px;color:var(--gray-700);max-width:200px">recall@5=1.00, faith=1.00, relev=1.00 — all within bounds</td>
+          </tr>
+
+          <tr>
+            <td style="min-width:200px;max-width:300px">
+              <span class="pill gray">hard_unanswerable</span><br>
+              <span style="font-size:13px;color:var(--gray-700)">What is Bergström's allocation to Japanese equities?</span>
+            </td>
+            <td class="mc" style="font-size:11px;max-width:180px;word-break:break-all">
+              <strong>Retrieved:</strong> bergstrom_ips, bergstrom_portfolio_q1_2026<br>
+              <strong>Expected:</strong> (none — unanswerable)<br>
+              <strong>Recall@5:</strong> N/A
+            </td>
+            <td style="font-size:13px;max-width:280px;color:var(--gray-700)">I don't know — the provided documents do not contain this information. The contexts list allocations for Nordic equity, US technology, European fixed income, Gulf real estate, and Alternatives, but Japanese equities are not mentioned.</td>
+            <td style="min-width:90px;text-align:center"><span class="pill olive">PASS</span></td>
+            <td style="font-size:12px;color:var(--gray-700);max-width:200px">Correctly returns 'I don't know' — unanswerable hallucination guard holds.</td>
+          </tr></tbody>
+    </table>
+  </div>
+  <div class="infobox">
+    <strong>Hamel rule:</strong> each FAIL entry has a one-line diagnostic above.
+    Green rows confirm the retrieval pipeline surfaces the right documents and
+    the LLM answer stays grounded in the contexts.
+  </div>
+</section>
+
+</div>
+<script>
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('section').forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

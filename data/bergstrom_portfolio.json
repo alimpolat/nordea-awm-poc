@@ -1,0 +1,46 @@
+{
+  "client_id": "bergstrom",
+  "client_name": "Bergström Family Office",
+  "mandate": "Advisory",
+  "domicile": "Stockholm, Sweden",
+  "base_currency": "SEK",
+  "aum_sek": 480000000,
+  "as_of": "2026-03-31",
+  "last_meeting_date": "2026-04-14",
+  "single_position_limit_pct": 5.0,
+  "fx_floor_pct": 60.0,
+  "fx_policy": "Minimum 60% SEK base-currency exposure across the total book.",
+  "target_allocation": {
+    "Nordic equity": 0.35,
+    "US tech": 0.15,
+    "EU fixed income": 0.20,
+    "Gulf real estate": 0.10,
+    "Alternatives": 0.20
+  },
+  "current_allocation": {
+    "Nordic equity": 0.35,
+    "US tech": 0.20,
+    "EU fixed income": 0.15,
+    "Gulf real estate": 0.15,
+    "Alternatives": 0.15
+  },
+  "holdings": [
+    {"ticker": "INVE-B.ST", "name": "Investor AB ser. B", "asset_class": "Nordic equity", "quantity": 116000, "cost_basis": 27000000, "current_mv": 36000000, "ytd_return_pct": 9.2, "dividend_ytd": 1020000, "fx_exposure": "SEK"},
+    {"ticker": "ATCO-A.ST", "name": "Atlas Copco AB ser. A", "asset_class": "Nordic equity", "quantity": 175000, "cost_basis": 24500000, "current_mv": 32000000, "ytd_return_pct": 7.8, "dividend_ytd": 430000, "fx_exposure": "SEK"},
+    {"ticker": "VOLV-B.ST", "name": "Volvo AB ser. B", "asset_class": "Nordic equity", "quantity": 92000, "cost_basis": 23000000, "current_mv": 28000000, "ytd_return_pct": 5.1, "dividend_ytd": 1200000, "fx_exposure": "SEK"},
+    {"ticker": "HEXA-B.ST", "name": "Hexagon AB ser. B", "asset_class": "Nordic equity", "quantity": 220000, "cost_basis": 22400000, "current_mv": 26000000, "ytd_return_pct": 6.4, "dividend_ytd": 180000, "fx_exposure": "SEK"},
+    {"ticker": "ASSA-B.ST", "name": "Assa Abloy AB ser. B", "asset_class": "Nordic equity", "quantity": 72000, "cost_basis": 20800000, "current_mv": 24000000, "ytd_return_pct": 4.7, "dividend_ytd": 360000, "fx_exposure": "SEK"},
+    {"ticker": "SAND.ST", "name": "Sandvik AB", "asset_class": "Nordic equity", "quantity": 86000, "cost_basis": 18900000, "current_mv": 22000000, "ytd_return_pct": 6.0, "dividend_ytd": 550000, "fx_exposure": "SEK"},
+    {"ticker": "QQQ", "name": "Invesco QQQ Trust ETF", "asset_class": "US tech", "quantity": 52000, "cost_basis": 24000000, "current_mv": 36000000, "ytd_return_pct": 14.1, "dividend_ytd": 180000, "fx_exposure": "USD"},
+    {"ticker": "AAPL", "name": "Apple Inc.", "asset_class": "US tech", "quantity": 9500, "cost_basis": 15000000, "current_mv": 22000000, "ytd_return_pct": 11.3, "dividend_ytd": 70000, "fx_exposure": "USD"},
+    {"ticker": "MSFT", "name": "Microsoft Corp.", "asset_class": "US tech", "quantity": 4200, "cost_basis": 14500000, "current_mv": 22000000, "ytd_return_pct": 12.6, "dividend_ytd": 120000, "fx_exposure": "USD"},
+    {"ticker": "NVDA", "name": "NVIDIA Corp.", "asset_class": "US tech", "quantity": 11000, "cost_basis": 7500000, "current_mv": 16000000, "ytd_return_pct": 22.5, "dividend_ytd": 10000, "fx_exposure": "USD"},
+    {"ticker": "DE10Y-BUND", "name": "German Bund 1.7% 2036", "asset_class": "EU fixed income", "quantity": 30000, "cost_basis": 28600000, "current_mv": 28000000, "ytd_return_pct": -1.2, "dividend_ytd": 740000, "fx_exposure": "EUR"},
+    {"ticker": "FR10Y-OAT", "name": "French OAT 2.0% 2036", "asset_class": "EU fixed income", "quantity": 21000, "cost_basis": 20400000, "current_mv": 20000000, "ytd_return_pct": -0.9, "dividend_ytd": 620000, "fx_exposure": "EUR"},
+    {"ticker": "IEAC", "name": "iShares EUR Corp Bond UCITS ETF", "asset_class": "EU fixed income", "quantity": 165000, "cost_basis": 23600000, "current_mv": 24000000, "ytd_return_pct": 1.4, "dividend_ytd": 840000, "fx_exposure": "EUR"},
+    {"ticker": "REIT.DI", "name": "Emirates REIT (Dubai commercial)", "asset_class": "Gulf real estate", "quantity": 4200000, "cost_basis": 31000000, "current_mv": 40000000, "ytd_return_pct": 12.8, "dividend_ytd": 1900000, "fx_exposure": "AED"},
+    {"ticker": "4250.SR", "name": "Jabal Omar Development Co. (Makkah)", "asset_class": "Gulf real estate", "quantity": 1350000, "cost_basis": 27000000, "current_mv": 32000000, "ytd_return_pct": 9.4, "dividend_ytd": 600000, "fx_exposure": "SAR"},
+    {"ticker": "NORD-PE-VII", "name": "Nordic Private Equity Fund VII (illiquid)", "asset_class": "Alternatives", "quantity": 1, "cost_basis": 30000000, "current_mv": 44000000, "ytd_return_pct": 8.0, "dividend_ytd": 0, "fx_exposure": "EUR"},
+    {"ticker": "GLOB-INFRA", "name": "Global Infrastructure Fund II", "asset_class": "Alternatives", "quantity": 1, "cost_basis": 22000000, "current_mv": 28000000, "ytd_return_pct": 5.5, "dividend_ytd": 1100000, "fx_exposure": "USD"}
+  ]
+}

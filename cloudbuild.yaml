@@ -1,0 +1,19 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ['build','-t','europe-west1-docker.pkg.dev/$PROJECT_ID/awm-poc/awm-poc','.']
+  - name: gcr.io/cloud-builders/docker
+    args: ['push','europe-west1-docker.pkg.dev/$PROJECT_ID/awm-poc/awm-poc']
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: ['run','deploy','nordea-awm-poc',
+           '--image','europe-west1-docker.pkg.dev/$PROJECT_ID/awm-poc/awm-poc',
+           '--region','europe-west1',
+           '--allow-unauthenticated',
+           '--min-instances','0','--max-instances','3',
+           '--cpu','2','--memory','4Gi','--timeout','60',
+           '--set-env-vars','GCP_PROJECT_ID=$PROJECT_ID,GCP_LOCATION=us-central1,INTEL_MODE=auto',
+           '--service-account','awm-poc-runtime@$PROJECT_ID.iam.gserviceaccount.com']
+images:
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/awm-poc/awm-poc'
+options:
+  logging: CLOUD_LOGGING_ONLY

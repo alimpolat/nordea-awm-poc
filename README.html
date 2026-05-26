@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nordea AWM AI POC — README</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ivory: #FAF9F5; --paper: #FFFFFF; --slate: #141413;
+    --clay: #D97757; --clay-bg: rgba(217,119,87,0.10);
+    --oat: #E3DACC;
+    --olive: #788C5D; --olive-bg: rgba(120,140,93,0.12);
+    --rust: #B04A3F; --rust-bg: rgba(176,74,63,0.10);
+    --amber: #C7A35F; --amber-bg: rgba(199,163,95,0.14);
+    --gray-100: #F7F4EC; --gray-150: #F0EEE6; --gray-300: #D1CFC5;
+    --gray-500: #87867F; --gray-700: #3D3D3A;
+    --serif: 'Newsreader', Georgia, "Times New Roman", serif;
+    --mono: 'JetBrains Mono', ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--ivory);color:var(--slate);font-family:var(--serif);font-weight:400;font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;padding:0 24px 96px;}
+  .sheet{max-width:1080px;margin:0 auto;}
+
+  /* top banner */
+  .top-banner{background:var(--clay-bg);border-bottom:2px solid var(--clay);padding:14px 0;margin-bottom:0;}
+  .top-banner .sheet{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+  .top-banner .tb-label{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--clay);white-space:nowrap;}
+  .top-banner .tb-text{font-family:var(--mono);font-size:12px;color:var(--gray-700);flex:1;}
+  .top-banner a{color:var(--clay);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(217,119,87,0.4);}
+  .top-banner a:hover{border-bottom-color:var(--clay);}
+  .top-banner .tb-note{font-family:var(--mono);font-size:11px;color:var(--gray-500);white-space:nowrap;}
+
+  header.hero{padding:48px 0 32px;}
+  .eyebrow{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--clay);margin-bottom:14px;}
+  h1{font-family:var(--serif);font-weight:500;font-size:46px;letter-spacing:-0.015em;line-height:1.08;margin-bottom:14px;}
+  .lead{font-size:18px;line-height:1.65;color:var(--gray-700);max-width:840px;margin-bottom:20px;}
+  .lead strong{color:var(--slate);}
+  .metabar{display:flex;flex-wrap:wrap;gap:0;font-family:var(--mono);font-size:11.5px;color:var(--gray-500);border-top:1px solid var(--gray-300);border-bottom:1px solid var(--gray-300);padding:14px 0;margin-top:8px;}
+  .metabar>div{padding:0 22px 0 0;margin-right:22px;border-right:1px solid var(--gray-300);}
+  .metabar>div:last-child{border-right:none;margin-right:0;padding-right:0;}
+  .metabar strong{color:var(--slate);font-weight:500;}
+
+  section{margin-top:56px;opacity:0;transform:translateY(8px);transition:opacity 600ms ease,transform 600ms ease;}
+  section.visible{opacity:1;transform:translateY(0);}
+  .section-eyebrow{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--clay);margin-bottom:8px;}
+  h2{font-family:var(--serif);font-weight:500;font-size:28px;letter-spacing:-0.01em;line-height:1.2;margin-bottom:16px;}
+  h3{font-family:var(--serif);font-weight:500;font-size:21px;margin:28px 0 10px;color:var(--slate);}
+  p{font-size:16px;line-height:1.65;color:var(--gray-700);margin-bottom:12px;max-width:880px;}
+  p strong{color:var(--slate);}
+  p code,li code,.mono{font-family:var(--mono);font-size:13px;background:var(--gray-150);padding:1px 6px;border-radius:3px;color:var(--slate);}
+  ul,ol{margin:10px 0 14px 24px;}
+  ul li,ol li{font-size:16px;line-height:1.6;color:var(--gray-700);margin-bottom:6px;}
+  ul li strong,ol li strong{color:var(--slate);}
+
+  a{color:var(--clay);text-decoration:none;border-bottom:1px solid transparent;transition:border-color 200ms ease;}
+  a:hover{border-bottom-color:var(--clay);}
+
+  pre{background:var(--gray-100);border:1.5px solid var(--gray-300);border-radius:10px;padding:18px 22px;margin:14px 0;font-family:var(--mono);font-size:13px;line-height:1.6;overflow-x:auto;color:var(--slate);}
+
+  .table-wrap{overflow-x:auto;margin:14px 0;}
+  table{width:100%;border-collapse:collapse;background:var(--paper);border:1.5px solid var(--gray-300);border-radius:14px;overflow:hidden;font-size:13.5px;}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--gray-300);vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  th{background:var(--gray-100);font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray-500);font-weight:500;}
+  td.mc{font-family:var(--mono);font-size:12px;color:var(--slate);}
+
+  .card{background:var(--paper);border:1.5px solid var(--gray-300);border-radius:14px;padding:22px 24px;margin:14px 0;}
+  .card+.card{margin-top:12px;}
+  .card h3{margin-top:0;}
+
+  .infobox{background:var(--clay-bg);border-left:3px solid var(--clay);padding:14px 20px;margin:14px 0;border-radius:4px;font-size:15px;line-height:1.6;color:var(--gray-700);max-width:1000px;}
+  .infobox strong{color:var(--clay);}
+  .infobox.olive{background:var(--olive-bg);border-left-color:var(--olive);}
+  .infobox.olive strong{color:var(--olive);}
+  .infobox.amber{background:var(--amber-bg);border-left-color:var(--amber);}
+  .infobox.amber strong{color:#8C7038;}
+  .infobox.rust{background:var(--rust-bg);border-left-color:var(--rust);}
+  .infobox.rust strong{color:var(--rust);}
+
+  .pill{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 9px;border-radius:999px;letter-spacing:0.08em;text-transform:uppercase;}
+  .pill.olive{background:var(--olive-bg);color:var(--olive);}
+  .pill.amber{background:var(--amber-bg);color:#8C7038;}
+  .pill.clay{background:var(--clay-bg);color:var(--clay);}
+
+  .stack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:18px 0;}
+  .stack-card{background:var(--paper);border:1.5px solid var(--gray-300);border-radius:14px;padding:18px 20px;}
+  .stack-card .layer{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.14em;color:var(--gray-500);margin-bottom:6px;}
+  .stack-card ul{margin:0;padding-left:18px;}
+  .stack-card li{font-size:14px;color:var(--gray-700);margin-bottom:4px;line-height:1.5;}
+  .stack-card li strong{color:var(--slate);}
+
+  .pointer-list{display:flex;flex-direction:column;gap:10px;margin:16px 0;}
+  .pointer{background:var(--paper);border:1.5px solid var(--gray-300);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:14px;}
+  .pointer .p-icon{font-size:22px;flex-shrink:0;}
+  .pointer .p-title{font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--clay);margin-bottom:3px;}
+  .pointer .p-desc{font-size:14px;color:var(--gray-700);}
+
+  footer{border-top:1px solid var(--gray-300);margin-top:80px;padding-top:24px;color:var(--gray-500);font-family:var(--mono);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+
+  @media(max-width:720px){
+    body{padding:36px 18px 60px;font-size:16px;}
+    h1{font-size:34px;}
+    h2{font-size:24px;}
+    .stack-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- top banner — live URL -->
+<div class="top-banner">
+  <div class="sheet">
+    <span class="tb-label">Live demo</span>
+    <span class="tb-text">
+      <a href="https://alimpolat-nordea-awm-poc.hf.space" target="_blank" rel="noopener">https://alimpolat-nordea-awm-poc.hf.space</a>
+      &nbsp;&mdash; Hugging Face Spaces · free tier · no card required
+    </span>
+    <span class="tb-note">Production target: EU-region Cloud Run &rarr; see infobox below</span>
+  </div>
+</div>
+
+<div class="sheet">
+
+<header class="hero">
+  <div class="eyebrow">Nordea AWM AI POC · Agentic Advisor-Flow Cockpit</div>
+  <h1>Agentic advisor-flow<br>for private banking</h1>
+  <p class="lead">
+    A <strong>five-stage agentic system</strong> that drafts a private-banking Monday brief for the
+    <strong>Bergström family office</strong> (fictitious Nordic UHNW, SEK 480M, global tilt).
+    Built as a demonstrator for the Nordea Head-of-AWM-AI mandate — from opportunity identification
+    and client insights through meeting preparation, grounded recommendations, and follow-up capture.
+    Every next-best-action is cited; every uncertainty says "I don't know."
+  </p>
+  <div class="metabar">
+    <div><strong>Runtime</strong> Hugging Face Spaces (Docker)</div>
+    <div><strong>Models</strong> Vertex AI Gemini 2.5 Pro / Flash</div>
+    <div><strong>Orchestration</strong> LlamaIndex Workflows · 5 stages</div>
+    <div><strong>Retrieval</strong> Qdrant + BM25 + RRF + Flash reranker</div>
+    <div><strong>Date</strong> 2026-05-26</div>
+  </div>
+</header>
+
+<!-- ── WHAT TO LOOK AT ── -->
+<section>
+  <div class="section-eyebrow">Start here</div>
+  <h2>What to look at</h2>
+  <p>Open the live URL and spend three minutes with these three things:</p>
+
+  <div class="pointer-list">
+    <div class="pointer">
+      <div class="p-icon">&#x1F4CA;</div>
+      <div>
+        <div class="p-title">The Monday brief</div>
+        <div class="p-desc">Loads on page open from a pre-generated cache. Scroll through the opportunity flags, next-best-actions (each cited to a source document), and risk panel. The Bergström portfolio is running +5pp over IPS target in US tech and Gulf real estate — those are the three NBAs.</div>
+      </div>
+    </div>
+    <div class="pointer">
+      <div class="p-icon">&#x1F4AC;</div>
+      <div>
+        <div class="p-title">The advisor chat</div>
+        <div class="p-desc">Below the brief, ask a question about the portfolio or IPS. The RAG pipeline retrieves from the Bergström corpus (portfolio, IPS, three meeting notes, IMF/ECB/BIS reports). Ask "What is Bergström's allocation to Japanese equities?" — it answers "I don't know" correctly.</div>
+      </div>
+    </div>
+    <div class="pointer">
+      <div class="p-icon">&#x1F517;</div>
+      <div>
+        <div class="p-title">The citations</div>
+        <div class="p-desc">Every recommendation card shows source doc IDs and the exact chunk used. Click any citation to see the grounding evidence. This is what makes the system demonstrable to a regulated private bank rather than a demo toy.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="infobox amber">
+    <strong>Note on hosting.</strong> The live URL runs on Hugging Face Spaces (free, zero-cost Docker
+    hosting). The production architecture targets EU-region Cloud Run — the GCP sandbox service account
+    is Vertex-scoped and does not have Cloud Run deploy permissions, so HF Spaces was used as the
+    POC-demo host. The Docker image and <code>cloudbuild.yaml</code> are ready for Cloud Run when
+    the service account is granted the deployer role.
+  </div>
+</section>
+
+<!-- ── TECH STACK ── -->
+<section>
+  <div class="section-eyebrow">Technology</div>
+  <h2>Stack</h2>
+
+  <div class="stack-grid">
+    <div class="stack-card">
+      <div class="layer">Runtime</div>
+      <ul>
+        <li><strong>Python 3.12</strong> · uv package manager</li>
+        <li><strong>FastAPI</strong> · ASGI server</li>
+        <li><strong>Docker</strong> · multi-stage image</li>
+        <li>HF Spaces / Cloud Run target</li>
+      </ul>
+    </div>
+    <div class="stack-card">
+      <div class="layer">AI / LLM</div>
+      <ul>
+        <li><strong>Gemini 2.5 Pro</strong> — Planner + Synthesizer</li>
+        <li><strong>Gemini 2.5 Flash</strong> — Scouts, specialists, reranker, chat</li>
+        <li><strong>gemini-embedding-001</strong> @768d task-typed</li>
+        <li>google-genai SDK → Vertex AI</li>
+      </ul>
+    </div>
+    <div class="stack-card">
+      <div class="layer">Retrieval</div>
+      <ul>
+        <li><strong>Qdrant</strong> embedded in-process (dense)</li>
+        <li><strong>rank_bm25</strong> (sparse)</li>
+        <li><strong>RRF k=60</strong> fusion</li>
+        <li><strong>Contextual Retrieval</strong> augmentation</li>
+        <li>Gemini Flash listwise reranker</li>
+      </ul>
+    </div>
+    <div class="stack-card">
+      <div class="layer">Orchestration</div>
+      <ul>
+        <li><strong>LlamaIndex Workflows</strong> — 5-stage flow</li>
+        <li><strong>asyncio.gather</strong> — 4 parallel specialists</li>
+        <li>Typed Pydantic output schemas</li>
+        <li>Cache-first brief serving</li>
+      </ul>
+    </div>
+    <div class="stack-card">
+      <div class="layer">Frontend</div>
+      <ul>
+        <li><strong>React 18</strong> + Vite + Tailwind CSS</li>
+        <li><strong>Apache ECharts</strong> — all charts</li>
+        <li>Human-in-the-loop controls</li>
+        <li>live / snapshot provenance tags</li>
+      </ul>
+    </div>
+    <div class="stack-card">
+      <div class="layer">Observability &amp; Eval</div>
+      <ul>
+        <li><strong>Arize Phoenix</strong> — distributed tracing</li>
+        <li><strong>Ragas 0.4.3</strong> + custom Gemini Flash judge</li>
+        <li>35 synthetic Qs · recall@5, faithfulness, relevancy</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ── RUN LOCALLY ── -->
+<section>
+  <div class="section-eyebrow">Local setup</div>
+  <h2>Run locally</h2>
+
+  <h3>Prerequisites</h3>
+  <ul>
+    <li>Python 3.12 + <a href="https://docs.astral.sh/uv/" target="_blank">uv</a></li>
+    <li>GCP service account JSON with Vertex AI permissions (place at repo root, see <code>.env.example</code>)</li>
+  </ul>
+
+  <h3>Install &amp; start</h3>
+<pre>git clone &lt;this repo&gt;
+cd nordea-awm-poc
+
+# install deps (uv resolves from uv.lock)
+uv sync --extra dev
+
+# copy and fill env
+cp .env.example .env
+
+# verify Vertex AI auth
+uv run --no-sync python scripts/smoke_vertex.py
+
+# start the server (FastAPI + React served from /static)
+uv run --no-sync uvicorn app.main:app --port 8001 --reload
+# open http://localhost:8001</pre>
+
+  <h3>Rebuild the brief &amp; index</h3>
+<pre># re-run the 5-stage agentic flow and write brief cache
+uv run --no-sync python -m app.orchestrator
+
+# rebuild the Qdrant + BM25 index from corpus
+uv run --no-sync python scripts/build_index.py</pre>
+
+  <h3>Tests</h3>
+<pre># 67 offline tests (no live Vertex calls)
+uv run --no-sync pytest -m "not live" -q</pre>
+
+  <h3>Environment variables</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Variable</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td class="mc">GOOGLE_APPLICATION_CREDENTIALS</td><td>Path to GCP service-account JSON (repo root, gitignored)</td></tr>
+        <tr><td class="mc">GCP_PROJECT_ID</td><td>GCP project — <code>gg-gcpsbprojs-004</code></td></tr>
+        <tr><td class="mc">GCP_LOCATION</td><td>Vertex AI region — <code>us-central1</code></td></tr>
+        <tr><td class="mc">INTEL_MODE</td><td><code>auto</code> | <code>live</code> | <code>snapshot</code> — World_Monitor behaviour</td></tr>
+        <tr><td class="mc">GCP_SA_KEY_B64</td><td>Base64-encoded SA JSON for container deployments (HF Spaces secret)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── FILE STRUCTURE ── -->
+<section>
+  <div class="section-eyebrow">Repository</div>
+  <h2>File structure</h2>
+<pre>nordea-awm-poc/
+├── app/
+│   ├── main.py               # FastAPI app, /api routes
+│   ├── orchestrator.py       # LlamaIndex Workflows — 5-stage runner
+│   ├── schemas.py            # Pydantic output schemas (BriefSchema, NBAs, …)
+│   ├── settings.py           # env config
+│   ├── fixtures.py           # Bergström family-office fixture loader
+│   ├── agents/               # one file per stage-agent
+│   │   ├── opportunity_scout.py
+│   │   ├── client_insights.py
+│   │   ├── planner.py
+│   │   ├── intel_gathering.py
+│   │   ├── macro.py
+│   │   ├── portfolio.py
+│   │   ├── news.py
+│   │   ├── synthesizer.py
+│   │   └── chat.py
+│   ├── retrieval/            # hybrid RAG stack
+│   │   ├── embedder.py       # task-typed gemini-embedding-001
+│   │   ├── contextual.py     # Anthropic Contextual Retrieval augmentation
+│   │   ├── qdrant_store.py   # dense vector store (embedded)
+│   │   ├── bm25.py           # sparse BM25 index
+│   │   ├── hybrid.py         # RRF k=60 fusion
+│   │   ├── reranker.py       # Gemini Flash listwise reranker
+│   │   └── chunker.py        # semantic chunking
+│   ├── intel/                # World_Monitor client + snapshot fallback
+│   │   ├── world_monitor_client.py
+│   │   └── snapshot_loader.py
+│   ├── llm/                  # Vertex AI client wrapper
+│   └── static/               # compiled React frontend (Vite build)
+├── frontend/                 # React 18 + Vite + Tailwind source
+├── data/                     # raw corpus (PDFs, fixtures)
+├── scripts/
+│   ├── build_index.py        # one-time index build
+│   ├── fetch_corpus.py       # download public docs
+│   └── smoke_vertex.py       # Vertex AI auth check
+├── eval/
+│   ├── run_ragas.py          # evaluation runner
+│   ├── synthetic_qs.jsonl    # 35 test questions
+│   └── results/              # ragas_results.json, hand_review.html, …
+├── tests/                    # pytest suite (67 offline tests)
+├── fallback/
+│   └── brief_static_20260601.html   # static brief snapshot (cache fallback)
+├── docs/                     # design + architecture HTML docs
+├── Dockerfile                # multi-stage Docker build
+├── cloudbuild.yaml           # Cloud Run build config
+├── pyproject.toml            # uv / pytest config
+├── README.html               # this file
+├── ARCHITECTURE.html         # system design doc
+└── EVAL.html                 # evaluation trust receipt</pre>
+</section>
+
+<!-- ── POINTERS ── -->
+<section>
+  <div class="section-eyebrow">Further reading</div>
+  <h2>Design &amp; evaluation docs</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Document</th><th>Contents</th></tr></thead>
+      <tbody>
+        <tr><td><a href="ARCHITECTURE.html">ARCHITECTURE.html</a></td><td>System design: single-container shape, animated 5-stage flow diagram, retrieval pipeline, model routing table, decisions log</td></tr>
+        <tr><td><a href="EVAL.html">EVAL.html</a></td><td>Evaluation trust receipt: recall@5 0.909 / faithfulness 0.963 / answer-relevancy 1.000 · per-intent breakdown · Phoenix trace · hand review</td></tr>
+        <tr><td><a href="docs/Architecture_Flow_2026-05-25.html">docs/Architecture_Flow_2026-05-25.html</a></td><td>Original architecture flow doc with ECharts latency &amp; cost charts</td></tr>
+        <tr><td><a href="docs/2026-05-24-nordea-awm-ai-poc-design.html">docs/2026-05-24-nordea-awm-ai-poc-design.html</a></td><td>Full 22-section design specification</td></tr>
+        <tr><td><a href="eval/results/hand_review.html">eval/results/hand_review.html</a></td><td>RAG hand review: worst/best/unanswerable sampled rows</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="infobox rust">
+    <strong>POC status.</strong> This is a proof-of-concept built for evaluation purposes. The Bergström family office and all associated data are entirely fictitious. The system is not connected to any live financial data or production Nordea systems.
+  </div>
+</section>
+
+<footer>
+  <div>Nordea AWM AI POC · README · 2026-05-26 · Alim Polat</div>
+  <div>Python 3.12 · FastAPI · Vertex AI Gemini 2.5 · Qdrant · LlamaIndex</div>
+</footer>
+
+</div><!-- .sheet -->
+
+<script>
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.06 });
+  document.querySelectorAll('section').forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

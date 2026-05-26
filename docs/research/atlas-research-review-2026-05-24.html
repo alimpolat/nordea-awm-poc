@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adversarial Peer Review — Atlas RAG SOTA Research — 2026-05-24</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+  .chart-wrap { background: #FFFFFF; border: 1.5px solid #D1CFC5; border-radius: 14px; padding: 20px 24px 16px; margin: 18px 0; max-width: 1000px; }
+  .chart-eyebrow { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #87867F; margin-bottom: 4px; }
+  .chart-title { font-family: 'Newsreader', serif; font-weight: 500; font-size: 18px; color: #141413; margin-bottom: 10px; }
+  .chart-canvas { width: 100%; height: 320px; }
+  .chart-canvas.tall { height: 520px; }
+  .chart-caption { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #87867F; text-align: right; margin-top: 6px; }
+  :root {
+    --ivory: #FAF9F5; --paper: #FFFFFF; --slate: #141413;
+    --clay: #D97757; --clay-bg: rgba(217, 119, 87, 0.10);
+    --oat: #E3DACC;
+    --olive: #788C5D; --olive-bg: rgba(120, 140, 93, 0.12);
+    --rust: #B04A3F; --rust-bg: rgba(176, 74, 63, 0.10);
+    --amber: #C7A35F; --amber-bg: rgba(199, 163, 95, 0.14);
+    --gray-100: #F7F4EC; --gray-150: #F0EEE6; --gray-300: #D1CFC5;
+    --gray-500: #87867F; --gray-700: #3D3D3A;
+    --serif: 'Newsreader', Georgia, "Times New Roman", serif;
+    --mono:  'JetBrains Mono', ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--ivory); color: var(--slate); font-family: var(--serif); font-weight: 400; font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased; padding: 56px 24px 96px; }
+  .sheet { max-width: 1080px; margin: 0 auto; }
+
+  header.hero { margin-bottom: 48px; }
+  .eyebrow { font-family: var(--mono); font-weight: 500; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--clay); margin-bottom: 14px; }
+  h1 { font-family: var(--serif); font-weight: 500; font-size: 50px; letter-spacing: -0.015em; line-height: 1.08; margin-bottom: 18px; }
+  .lead { font-size: 18px; line-height: 1.65; color: var(--gray-700); max-width: 820px; margin-bottom: 24px; }
+  .lead strong { color: var(--slate); }
+  .lead em { color: var(--clay); font-style: normal; }
+  .metabar { display: flex; flex-wrap: wrap; gap: 0; font-family: var(--mono); font-size: 11.5px; color: var(--gray-500); border-top: 1px solid var(--gray-300); border-bottom: 1px solid var(--gray-300); padding: 14px 0; margin-top: 8px; }
+  .metabar > div { padding: 0 22px 0 0; margin-right: 22px; border-right: 1px solid var(--gray-300); }
+  .metabar > div:last-child { border-right: none; margin-right: 0; padding-right: 0; }
+  .metabar strong { color: var(--slate); font-weight: 500; }
+
+  section { margin-top: 64px; opacity: 0; transform: translateY(8px); transition: opacity 600ms ease, transform 600ms ease; }
+  section.visible { opacity: 1; transform: translateY(0); }
+  .section-eyebrow { font-family: var(--mono); font-weight: 500; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--clay); margin-bottom: 8px; }
+  h2 { font-family: var(--serif); font-weight: 500; font-size: 32px; letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 16px; }
+  h3 { font-family: var(--serif); font-weight: 500; font-size: 21px; margin: 28px 0 12px; }
+  h4 { font-family: var(--serif); font-weight: 600; font-size: 17px; margin: 18px 0 6px; color: var(--slate); }
+  p { font-size: 17px; line-height: 1.65; color: var(--gray-700); margin-bottom: 16px; max-width: 880px; }
+  p strong { color: var(--slate); }
+  p code, li code, .mono, td code { font-family: var(--mono); font-size: 14px; background: var(--gray-150); padding: 1px 6px; border-radius: 3px; color: var(--slate); }
+  pre { background: var(--gray-100); border: 1px solid var(--gray-300); border-radius: 8px; padding: 18px 22px; margin: 16px 0; max-width: 1000px; overflow-x: auto; font-family: var(--mono); font-size: 13.5px; line-height: 1.55; color: var(--slate); }
+  ul, ol { margin: 14px 0 16px 26px; }
+  ul li, ol li { font-size: 17px; line-height: 1.65; color: var(--gray-700); margin-bottom: 10px; }
+  ul li strong { color: var(--slate); }
+
+  table { width: 100%; border-collapse: collapse; background: var(--paper); border: 1.5px solid var(--gray-300); border-radius: 14px; overflow: hidden; font-size: 15.5px; margin: 16px 0; max-width: 1000px; }
+  th, td { text-align: left; padding: 14px 18px; border-bottom: 1px solid var(--gray-300); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  th { background: var(--gray-100); font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--gray-500); font-weight: 500; }
+  td.dim { font-weight: 500; color: var(--slate); width: 28%; }
+  td.num { font-family: var(--mono); font-weight: 600; text-align: center; width: 12%; }
+
+  .infobox { background: var(--clay-bg); border-left: 3px solid var(--clay); padding: 18px 24px; margin: 20px 0; border-radius: 4px; font-size: 16.5px; line-height: 1.65; color: var(--gray-700); max-width: 1000px; }
+  .infobox strong { color: var(--clay); }
+  .infobox.olive { background: var(--olive-bg); border-left-color: var(--olive); }
+  .infobox.olive strong { color: var(--olive); }
+  .infobox.amber { background: var(--amber-bg); border-left-color: var(--amber); }
+  .infobox.amber strong { color: #8C7038; }
+  .infobox.rust { background: var(--rust-bg); border-left-color: var(--rust); }
+  .infobox.rust strong { color: var(--rust); }
+
+  .pill { display: inline-block; font-family: var(--mono); font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; letter-spacing: 0.10em; text-transform: uppercase; }
+  .pill.olive { background: var(--olive-bg); color: var(--olive); }
+  .pill.amber { background: var(--amber-bg); color: #8C7038; }
+  .pill.rust  { background: var(--rust-bg);  color: var(--rust); }
+  .pill.clay  { background: var(--clay-bg);  color: var(--clay); }
+
+  .step { background: var(--paper); border: 1.5px solid var(--gray-300); border-radius: 12px; padding: 22px 26px; margin: 14px 0; max-width: 1000px; }
+  .step-header { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+  .score-badge { width: 46px; height: 46px; border-radius: 10px; color: var(--paper); display: grid; place-items: center; font-family: var(--mono); font-weight: 600; font-size: 17px; flex-shrink: 0; }
+  .score-badge.olive { background: var(--olive); }
+  .score-badge.amber { background: var(--amber); }
+  .score-badge.rust  { background: var(--rust); }
+  .step-title { font-family: var(--serif); font-weight: 500; font-size: 20px; color: var(--slate); }
+  .step-title small { display: block; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray-500); margin-top: 2px; }
+
+  .claim { background: var(--paper); border: 1.5px solid var(--gray-300); border-left: 4px solid var(--rust); border-radius: 10px; padding: 18px 22px; margin: 14px 0; max-width: 1000px; }
+  .claim .ctag { font-family: var(--mono); font-size: 10.5px; font-weight: 600; letter-spacing: 0.10em; text-transform: uppercase; color: var(--rust); margin-bottom: 6px; }
+  .claim.amber { border-left-color: var(--amber); }
+  .claim.amber .ctag { color: #8C7038; }
+  .claim .quote { font-family: var(--serif); font-style: italic; color: var(--slate); margin-bottom: 8px; font-size: 16px; }
+  .claim .why { font-size: 15.5px; color: var(--gray-700); }
+  .claim .why strong { color: var(--slate); }
+
+  a { color: var(--clay); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 200ms ease; }
+  a:hover { border-bottom-color: var(--clay); }
+
+  footer { border-top: 1px solid var(--gray-300); margin-top: 80px; padding-top: 24px; color: var(--gray-500); font-family: var(--mono); font-size: 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
+
+  @media (max-width: 720px) {
+    body { padding: 36px 18px 60px; font-size: 16px; }
+    h1 { font-size: 34px; }
+    h2 { font-size: 26px; }
+    p, ul li, ol li { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="hero">
+    <div class="eyebrow">Independent Peer Review · Atlas RAG SOTA Research · 2026-05-24</div>
+    <h1>Adversarial Review of the Atlas RAG Research</h1>
+    <p class="lead">
+      An <em>independent, hostile-by-design</em> stress-test of the Atlas research that recommends the Nordea AWM POC stack. I did not write the research. The job is to find where it would embarrass Alim in front of a Tier-1-bank Head of AI — not to rubber-stamp it. <strong>The headline section is "Claims that MUST be human-verified":</strong> every benchmark number and citation that, if wrong, becomes a credibility crater.
+    </p>
+    <div class="metabar">
+      <div><strong>Reviewer</strong> · Independent staff AI/ML engineer</div>
+      <div><strong>Date</strong> · 2026-05-24</div>
+      <div><strong>Subject</strong> · atlas-rag-sota-2026-05-24.html</div>
+      <div><strong>Verdict</strong> · Ship with fixes</div>
+    </div>
+  </header>
+
+  <section>
+    <div class="section-eyebrow">§ 0 · Overall verdict</div>
+    <h2>Ship with fixes</h2>
+    <div class="infobox amber">
+      <strong>Ship with fixes.</strong> The architecture this research recommends is correct, current, and defensible — the directional calls (agentic-RAG over naive, hybrid + contextual + rerank, Gemini-native everything, skip GraphRAG/ColBERT/LangGraph for 8 days) are exactly what a competent 2026 engineer would land on, and the "skip" list is the strongest part of the document. <strong>But it is unsafe to cite verbatim to Nordea.</strong> It mixes hard-verifiable benchmark numbers (MTEB 68.32, "49%/67% failure reduction", recall 0.72→0.91) with at least one number the document itself invented (Figure 4's 0.81 dense / 0.91 hybrid is presented as a "finance corpus benchmark" with no traceable source), several citations that look synthetic (URLs with future dates, an arbitrarily long tweet-ID), and one technical claim that directly contradicts the spec it produced (Qdrant "local Docker" in the research vs "Qdrant embedded in-process" in the spec — a real deployment-model question the research never resolved). Fix the citations and the embedded-mode question, soften the invented benchmarks to "directional", and it ships.
+    </div>
+  </section>
+
+  <section>
+    <div class="section-eyebrow">§ 1 · Score summary</div>
+    <h2>Eight dimensions, scored</h2>
+    <table>
+      <thead><tr><th>Dimension</th><th class="num">Score</th><th>One-line verdict</th></tr></thead>
+      <tbody>
+        <tr><td class="dim">1 · Currency</td><td class="num" style="color:var(--olive)">8</td><td>Genuinely 2026, not recycled 2024 — the "what changed" framing is right</td></tr>
+        <tr><td class="dim">2 · Technical soundness</td><td class="num" style="color:var(--amber)">7</td><td>Pipeline is sound; the Qdrant-on-Cloud-Run deployment story is hand-waved</td></tr>
+        <tr><td class="dim">3 · Source quality</td><td class="num" style="color:var(--rust)">4</td><td>Authoritative primaries mixed with future-dated / fabricated-looking URLs</td></tr>
+        <tr><td class="dim">4 · Internal consistency</td><td class="num" style="color:var(--amber)">6</td><td>Embedded-vs-Docker Qdrant + 3-vs-4 specialists contradict the spec</td></tr>
+        <tr><td class="dim">5 · Completeness</td><td class="num" style="color:var(--amber)">5</td><td>No PII/data-residency, no latency budget, no cold-start, no brief-quality eval</td></tr>
+        <tr><td class="dim">6 · Actionability</td><td class="num" style="color:var(--olive)">8</td><td>A competent engineer could build from this in 8 days — and the spec proves it</td></tr>
+        <tr><td class="dim">7 · Defensibility to senior banking audience</td><td class="num" style="color:var(--amber)">6</td><td>Strong instincts, but unverified numbers are a sniper-target for a CTO</td></tr>
+        <tr><td class="dim">8 · Risk calibration</td><td class="num" style="color:var(--olive)">8</td><td>"Skip" calls are excellent; slightly overconfident on benchmark certainty</td></tr>
+      </tbody>
+    </table>
+
+    <div class="chart-wrap">
+      <div class="chart-eyebrow">Figure A · Review scorecard</div>
+      <div class="chart-title">Eight dimensions · 0–10 · colored by band (olive ≥8 · amber 5–7 · rust &lt;5)</div>
+      <div id="chart-scores" class="chart-canvas tall"></div>
+      <div class="chart-caption">Reviewer scoring · mean 6.5 / 10 · "Ship with fixes"</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-eyebrow">§ 2 · The eight dimensions</div>
+    <h2>Scores with justification</h2>
+
+    <div class="step">
+      <div class="step-header"><div class="score-badge olive">8</div><div class="step-title">Currency<small>1 · Is this 2026 SOTA or recycled 2024?</small></div></div>
+      <p>Genuinely current. The spine — agentic-RAG as the headline, Contextual Retrieval as the chunking default, hybrid as table-stakes, long-context-did-not-kill-RAG, framework-wars-are-over — is the actual 2026 consensus, not 2024 cosplay. The "skip GraphRAG / it underperforms vanilla" call reflects the genuine 2025–26 deflation of graph hype. Points off because two "2026" framings lean on a single tweet and one dev.to post rather than durable sources, and "RAG 2.0 is Claude Code over your filesystem" is a provocative one-liner doing load-bearing work it can't support.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-header"><div class="score-badge amber">7</div><div class="step-title">Technical soundness<small>2 · Are the recommendations correct? Would they work?</small></div></div>
+      <p>Mostly right. Task-type embeddings (<code>RETRIEVAL_DOCUMENT</code> / <code>RETRIEVAL_QUERY</code>) is correct and genuinely under-used — good catch. Contextual Retrieval + hybrid + RRF + listwise rerank is a sound, standard 2026 pipeline. Orchestrator-subagent is appropriate and correctly scoped down. <strong>The hole:</strong> the research says "Qdrant local Docker" with a <code>docker run -p 6333:6333</code> command, but a single Cloud Run container cannot run a sidecar Docker daemon — and the spec it produced silently switched to "Qdrant embedded in-process," which is a different, more constrained mode (Qdrant's Python client local mode is explicitly not for production and has feature gaps vs the server). The research never names this fork or validates it. MRL "truncate to 768 without quality loss" overstates — there is measurable, usually-acceptable loss. Listwise LLM reranking adds a serial Gemini call on the critical path; the latency cost is never stated.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-header"><div class="score-badge rust">4</div><div class="step-title">Source quality<small>3 · Real, authoritative, well-chosen citations?</small></div></div>
+      <p>This is the weakest dimension and the reason this can't ship verbatim. The <em>good</em> primaries are plausibly real and well-chosen (Anthropic Contextual Retrieval, Anthropic multi-agent engineering post, Hamel's field guide, Jason Liu, Vertex task-types doc). But mixed in: a Jerry Liu tweet with a 19-digit status ID dated "May 2026" (<code>2000677592559706396</code> — implausible ID magnitude and an unverifiable future-dated claim), multiple "2026"-dated blog URLs from low-authority domains (callsphere.ai, heeya.fr, 4xxi, mindstudio) cited as if authoritative, and a <code>docs.cloud.google.com</code> host that is not Google's real docs domain (<code>cloud.google.com/docs</code> is). A banking CTO who clicks one dead or wrong link discounts the entire memo. Authoritative-looking ≠ authoritative.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-header"><div class="score-badge amber">6</div><div class="step-title">Internal consistency<small>4 · Do claims contradict across sections?</small></div></div>
+      <p>Two material contradictions between the research and the spec it informed. (1) <strong>Qdrant deployment:</strong> research = "local Docker / <code>docker run</code>"; spec = "embedded in-process." These are not the same thing and the gap is unaddressed. (2) <strong>Specialist count:</strong> research repeatedly prescribes "1 + 3 + 1" (three specialists); the spec ships four (adds World_Monitor Intel-Gathering). The spec's own decisions-log flags this as a deviation, so the spec caught it — but the research reads as internally authoritative on "three," which is now wrong for the build. Minor: Figure 1's radar gives the 2024 stack "Eval discipline 2" while the existing project actually ships TruLens (the RAG triad), so the baseline is undersold.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-header"><div class="score-badge amber">5</div><div class="step-title">Completeness<small>5 · What did it miss for THIS POC?</small></div></div>
+      <p>For a generic RAG memo this is complete. For a <em>private-banking, client-financial-data, Nordic-bank</em> POC it has real gaps: no PII / client-data handling stance, no GDPR or EU data-residency note (and it sends embeddings to Vertex in <code>us-central1</code> — a Nordic bank will ask about that on slide one), no prompt-injection / data-exfiltration consideration for the web-grounding tool, no latency budget (the spec later estimates ~15–18s; the research is silent), no Cloud Run cold-start analysis despite recommending a vector DB inside the container, and — most importantly — <strong>no evaluation of brief quality.</strong> Ragas measures retrieval/faithfulness, not whether the Monday brief is a good brief. The thing being judged is the brief, and nothing measures it.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-header"><div class="score-badge olive">8</div><div class="step-title">Actionability<small>6 · Could a competent engineer build from this in 8 days?</small></div></div>
+      <p>Yes — and the existence of a coherent, buildable spec downstream is the proof. The 5-stage pipeline is concrete (top-30 dense + top-30 BM25 → RRF k=60 → top-20 → listwise top-5), the payload schema is given, the model-role assignment is explicit. Deductions: the Qdrant-on-Cloud-Run mechanism is the single underspecified load-bearing piece (and it's on the Day-1/Day-2 critical path), and "generate 30 synthetic questions, hit context_recall &gt; 0.85" hand-waves the hardest part — building a trustworthy eval set in 8 days with no ground truth.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-header"><div class="score-badge amber">6</div><div class="step-title">Defensibility to senior banking audience<small>7 · Survives a buzzword-bingo grep?</small></div></div>
+      <p>The <em>instincts</em> are well-tuned for this audience: single-vendor trust story, "borrowed credibility from Anthropic," citations-are-non-negotiable, "don't oversell agentic-ness." A Head of AI will like the restraint. The vulnerability is precision: a Tier-1 CTO greps for exact numbers and exact sources. "67% reduction," "MTEB 68.32," "recall 0.72→0.91," "$33K to index" — each is a quotable claim that must trace to a real source under questioning. The research presents several of these with more certainty than the sourcing supports, and the invented Figure 4 numbers are a landmine. Strip or hedge anything you can't defend live.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-header"><div class="score-badge olive">8</div><div class="step-title">Risk calibration<small>8 · Overconfident anywhere? Are the "skip" calls right?</small></div></div>
+      <p>The "skip" list is the best-calibrated part of the document and I'd defend nearly all of it: skip GraphRAG/HippoRAG/PathRAG (correct for a closed 50-doc corpus on an 8-day clock), skip ColBERT (correct — cross-encoder/LLM rerank recovers most of the gain), skip LangGraph (correct — the learning curve is real and the demo value is zero), skip fine-tuned embeddings (correct — cold-start has no interaction data), skip MCP scaffolding (correct for a closed corpus). The overconfidence is not in the calls; it's in the <em>numerical certainty</em> ("none of them belong," "MTEB v2 leader at 68.32," "67%") stated without "approximately" or "per vendor's own benchmark." Calibrate the language, not the conclusions.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-eyebrow">§ 3 · The headline section</div>
+    <h2>Claims that MUST be human-verified before this goes to Nordea</h2>
+    <p>Every item below is a specific factual assertion that, if wrong, embarrasses Alim in front of the hiring manager. <span class="pill rust">Verify-hard</span> = do not cite until confirmed against a primary source. <span class="pill amber">Hedge</span> = real direction but soften the number / attribute the source.</p>
+
+    <div class="claim">
+      <div class="ctag">Verify-hard · invented number</div>
+      <div class="quote">Figure 4: "Recall@5 by retrieval method (finance corpus) — BM25 0.72 / Dense 0.81 / Hybrid 0.91."</div>
+      <div class="why">The caption sources this to "hybrid-retrieval benchmark on finance corpus with named entities" — <strong>which is not a real, named, citable benchmark.</strong> These look like illustrative numbers dressed as measured ones. The 0.72→0.91 hybrid jump also appears in §2 step 3 and §3 Q4 with no source. <strong>Action:</strong> either replace with a real cited benchmark (e.g. a published BEIR/finance hybrid result) or relabel explicitly as "illustrative, directional." Do not present as a measured finance result to a bank.</div>
+    </div>
+
+    <div class="claim">
+      <div class="ctag">Verify-hard · vendor benchmark stated as fact</div>
+      <div class="quote">"Contextual Retrieval reduces top-20 retrieval failures by 49% on its own, 67% with reranking."</div>
+      <div class="why">This is Anthropic's <em>own</em> published number on <em>their</em> benchmark mix — real, but it is a vendor self-report on a specific corpus, not a universal law. The §1 chart and §2 render it as 100→51→33 absolute failure rates, which silently converts a relative-reduction claim into an absolute-rate chart. <strong>Action:</strong> cite as "Anthropic-reported, on their benchmark" and drop the absolute-rate framing unless you can reproduce it on the Bergström corpus.</div>
+    </div>
+
+    <div class="claim">
+      <div class="ctag">Verify-hard · exact benchmark figure</div>
+      <div class="quote">"gemini-embedding-001 tops MTEB v2 English at 68.32" and Figure 3's full leaderboard (Qwen3-Embedding-8B 70.6, Voyage 3 large 70.2, Cohere v4 65.5, etc.).</div>
+      <div class="why">MTEB leaderboards move weekly and exact scores to two decimals are extremely falsifiable. The relative ordering may also be stale (Voyage/Qwen/Gemini have all leapfrogged each other). <strong>Action:</strong> pull the live MTEB v2 English board the week of sending, confirm gemini-embedding-001's exact score and rank, and date-stamp it ("as of 2026-05-XX"). A wrong second decimal in front of a CTO is a needless wound.</div>
+    </div>
+
+    <div class="claim">
+      <div class="ctag">Verify-hard · fabricated-looking citation</div>
+      <div class="quote">"Jerry Liu — RAG 2.0 as Claude Code on filesystem (May 2026)" → x.com/jerryjliu0/status/2000677592559706396</div>
+      <div class="why">A 19-digit status ID is implausibly large for a real tweet ID, and the quote is a future-dated paraphrase doing real argumentative work in Q1. This reads synthetic. <strong>Action:</strong> confirm the tweet exists and says this, or remove the line entirely. Citing a non-existent tweet to a bank is the single highest-embarrassment risk in the document.</div>
+    </div>
+
+    <div class="claim">
+      <div class="ctag">Verify-hard · wrong-looking host + URL</div>
+      <div class="quote">Vertex task-types and Gemini 2.5 Pro links use host <code>docs.cloud.google.com</code>.</div>
+      <div class="why">Google's documentation lives at <code>cloud.google.com/vertex-ai/...</code>, not <code>docs.cloud.google.com</code>. The substance (task-type embeddings exist and matter) is correct; the URLs likely 404. <strong>Action:</strong> replace with the real canonical Google Cloud doc URLs before any link is shared.</div>
+    </div>
+
+    <div class="claim">
+      <div class="ctag">Verify-hard · specific cost figure</div>
+      <div class="quote">"Microsoft's GraphRAG cost $33K to index large corpora."</div>
+      <div class="why">A precise dollar figure attributed to a "Graph RAG in 2026 practitioner's guide" Medium post — quotable and falsifiable. The directional point (GraphRAG indexing is expensive) is true; the exact $33K traces to a secondary blog, not Microsoft. <strong>Action:</strong> attribute precisely ("per [blog], illustrative") or drop the number and keep the qualitative point.</div>
+    </div>
+
+    <div class="claim">
+      <div class="ctag">Verify-hard · benchmark attribution + date</div>
+      <div class="quote">"GraphRAG-Bench (ICLR'26) shows GraphRAG frequently underperforms vanilla RAG."</div>
+      <div class="why">"ICLR'26" as a venue label on an arxiv preprint (2506.05690) needs confirming — acceptance, venue, and the exact claim wording. If you tell a CTO "an ICLR paper shows X" and it was a rejected/under-review preprint, that's a credibility hit. <strong>Action:</strong> verify venue status; otherwise cite as "arXiv preprint, 2025."</div>
+    </div>
+
+    <div class="claim amber">
+      <div class="ctag">Hedge · vendor pricing</div>
+      <div class="quote">"Grounding with Search: free tier 1,500 RPD shared, then $35/1k prompts" · "gemini-embedding-001 $0.15/MTok standard, $0.075/MTok batch."</div>
+      <div class="why">Vertex pricing and free-tier quotas change and vary by region/SKU. These are right-order-of-magnitude but stale-prone. <strong>Action:</strong> reconfirm on the live Vertex pricing page the week of sending; they feed the "&lt;€10 total" claim in the spec.</div>
+    </div>
+
+    <div class="claim amber">
+      <div class="ctag">Hedge · adoption name-drops</div>
+      <div class="quote">"LangGraph: Uber, Klarna, LinkedIn, JPMorgan, 400+ companies."</div>
+      <div class="why">Customer-logo claims sourced to a dev.to decision-guide. Mostly plausible but logo-claims to a bank should not rest on a blog. <strong>Action:</strong> only repeat logos you can source to the vendor's own case-study page, or drop them — they add nothing to the actual recommendation (which is to NOT use LangGraph).</div>
+    </div>
+
+    <div class="claim amber">
+      <div class="ctag">Hedge · research generalization</div>
+      <div class="quote">"Agentic capabilities degrade &gt;50% past 100K tokens (2026 research)" → arxiv 2505.20625.</div>
+      <div class="why">Real direction (long-context degrades in agentic settings) but "&gt;50% past 100K" is a sharp threshold that depends heavily on task and model. <strong>Action:</strong> confirm the paper says this for Gemini-class models specifically, or soften to "degrades materially."</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-eyebrow">§ 4 · Gaps to close before the POC ships</div>
+    <h2>What the research should have covered and didn't</h2>
+    <ol>
+      <li><strong>Resolve the Qdrant deployment model.</strong> "Local Docker" and "embedded in-process" are different products with different guarantees. Decide, justify, and test it on Day 1 — it's on the critical path. If embedded, name the limitations (single-process, no separate persistence guarantees) in the memo so a CTO doesn't catch it. Honestly, for a single-container 50-doc demo, <strong>LanceDB or even in-memory FAISS</strong> is lower-risk than either Qdrant mode; the research dismissed this on "reads as 2024" vibes, not engineering.</li>
+      <li><strong>Add a data-residency / GDPR paragraph.</strong> A Nordic bank's first question about any cloud AI is "where does client data go?" The stack sends embeddings + prompts to Vertex in <code>us-central1</code>. For fictitious Bergström data this is fine for a POC — but the memo must say so explicitly and name the production answer (EU-region Vertex endpoints, data-residency controls). The research is silent; this is a defensibility hole, not a build hole.</li>
+      <li><strong>Add a prompt-injection / grounding-tool threat note.</strong> The News specialist pulls live web content into a banking brief. Web-grounded RAG is a known prompt-injection vector. One sentence in the memo ("grounded facts are URI-cited and advisor-verified; we do not act on web content, only surface it") closes it. The research never raises it.</li>
+      <li><strong>State a latency budget.</strong> The research recommends a serial query-rewrite → dense+BM25 → RRF → listwise-LLM-rerank → Pro-synthesis chain plus parallel subagents, but never sums the latency. The spec later lands at ~15–18s for brief generation (mitigated by pre-caching) and &lt;5s for chat. The research should have owned this — listwise LLM reranking on the critical path is the kind of choice that needs a latency justification.</li>
+      <li><strong>Evaluate the brief, not just the retrieval.</strong> Ragas faithfulness/context-recall measures the RAG plumbing. Nobody measures whether the Monday brief is <em>good</em> — actionable, correctly prioritized, appropriately hedged. Add a 5–8 item rubric (are the 3 NBAs defensible? is confidence labeling honest? are quantities computed?) scored by Alim against the regression set. This is the eval that actually matters for an advisor-cockpit demo.</li>
+      <li><strong>Cold-start reality check.</strong> The research recommends a vector DB + 50-doc index inside a min-instances-0 Cloud Run container. Either the index builds at cold-start (slow, risky) or is baked into the image (the spec's choice, but the research never says). Name it.</li>
+      <li><strong>Reconcile the 3-vs-4 specialist count</strong> so the memo and the research appendix don't contradict each other when Thomas reads both.</li>
+    </ol>
+  </section>
+
+  <section>
+    <div class="section-eyebrow">§ 5 · What's genuinely strong</div>
+    <h2>Credit where due</h2>
+    <ul>
+      <li><strong>The directional architecture is correct.</strong> If a senior engineer built this POC cold, they'd land within a hair of this stack. That is the test that matters, and the research passes it.</li>
+      <li><strong>The "skip" list is excellent and well-calibrated.</strong> Resisting GraphRAG, ColBERT, LangGraph, fine-tuned embeddings, and MCP for an 8-day demo shows real production judgment. Most research agents would have padded the stack with shiny things; this one subtracts. That restraint is exactly the signal a Head of AI wants.</li>
+      <li><strong>Task-type embeddings is a genuine, specific, under-used insight</strong> — not a buzzword. Calling it out as "almost no 2024-era code does this" is the kind of concrete detail that reads as real expertise.</li>
+      <li><strong>The audience-awareness is sharp.</strong> "Don't show off Ragas dashboards," "borrowed credibility from Anthropic," single-vendor trust story, citations-non-negotiable — these are the instincts of someone who has actually presented to a regulated-finance audience. They will land with Thomas.</li>
+      <li><strong>It produced a buildable spec.</strong> The ultimate test of research-for-a-POC is whether someone can build from it. The downstream spec is coherent, scoped, and honest about depth-of-demo. The research did its job as an input.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="section-eyebrow">§ 6 · Bottom line</div>
+    <h2>One paragraph</h2>
+    <p>This is good research with a citation-hygiene problem. The thinking is current, the architecture is correct, the restraint is professional, and it generated a buildable spec — Alim can and should build essentially this POC. The danger is not the engineering; it's that the document launders several invented or unverifiable numbers (the Figure 4 finance-recall benchmark, the absolute-failure-rate chart, exact MTEB decimals) and at least one fabricated-looking citation (the 19-digit Jerry Liu tweet, the <code>docs.cloud.google.com</code> host) with the same confident tone as its solid primary sources. A Tier-1-bank Head of AI greps for exactly these. <strong>Before anything in this research is quoted to Nordea, Alim must (1) verify or delete every flagged claim in §3, (2) resolve the Qdrant embedded-vs-Docker question with a real test, and (3) add the data-residency, prompt-injection, latency, and brief-quality-eval paragraphs from §4.</strong> Do that and the research is a credible appendix that proves "stays current with emerging AI." Skip it and a single dead link or wrong decimal hands the CTO a reason to discount the whole package. Verdict: <strong>Ship with fixes.</strong></p>
+  </section>
+
+  <footer>
+    <div>Independent adversarial review · Atlas RAG SOTA research · 2026-05-24</div>
+    <div>Reviewer: staff AI/ML engineer · Verdict: Ship with fixes</div>
+  </footer>
+
+</div>
+<script>
+  const CLAY = '#D97757', OLIVE = '#788C5D', AMBER = '#C7A35F', RUST = '#B04A3F';
+  const SLATE = '#141413', GRAY500 = '#87867F', GRAY300 = '#D1CFC5', PAPER = '#FFFFFF';
+  const SERIF = "'Newsreader', Georgia, serif";
+  const MONO  = "'JetBrains Mono', monospace";
+
+  const baseTooltip = {
+    backgroundColor: 'rgba(255,255,255,0.96)', borderColor: GRAY300,
+    textStyle: { color: SLATE, fontFamily: SERIF, fontSize: 14 },
+    extraCssText: 'box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 8px;'
+  };
+  const baseAnim = { animation: true, animationEasing: 'cubicOut', animationDuration: 900 };
+
+  const dims = [
+    { name: 'Currency', score: 8 },
+    { name: 'Technical soundness', score: 7 },
+    { name: 'Source quality', score: 4 },
+    { name: 'Internal consistency', score: 6 },
+    { name: 'Completeness', score: 5 },
+    { name: 'Actionability', score: 8 },
+    { name: 'Defensibility (banking)', score: 6 },
+    { name: 'Risk calibration', score: 8 },
+  ];
+  const bandColor = s => s >= 8 ? OLIVE : (s >= 5 ? AMBER : RUST);
+
+  const scores = echarts.init(document.getElementById('chart-scores'));
+  scores.setOption({
+    ...baseAnim,
+    tooltip: { ...baseTooltip, trigger: 'item',
+      formatter: p => {
+        const idx = dims.length - 1 - p.dataIndex;
+        const band = dims[idx].score >= 8 ? 'strong' : (dims[idx].score >= 5 ? 'acceptable' : 'weak');
+        return `${dims[idx].name}<br/><strong>${p.value} / 10</strong><br/><span style="font-family:${MONO};font-size:11px;color:${GRAY500}">${band}</span>`;
+      }},
+    grid: { left: 8, right: 56, top: 18, bottom: 44, containLabel: true },
+    xAxis: {
+      type: 'value', max: 10, name: 'Score / 10', nameLocation: 'middle', nameGap: 32,
+      nameTextStyle: { color: SLATE, fontFamily: SERIF, fontSize: 13 },
+      axisLine: { lineStyle: { color: GRAY300 } },
+      axisLabel: { color: GRAY500, fontFamily: MONO, fontSize: 11 },
+      splitLine: { lineStyle: { color: GRAY300, type: 'dashed' } },
+    },
+    yAxis: {
+      type: 'category', data: dims.map(d => d.name).reverse(),
+      axisLine: { lineStyle: { color: GRAY300 } },
+      axisTick: { show: false },
+      axisLabel: { color: SLATE, fontFamily: SERIF, fontSize: 13, margin: 12 },
+      splitLine: { show: false },
+    },
+    series: [{
+      type: 'bar',
+      data: dims.slice().reverse().map(d => ({ value: d.score, itemStyle: { color: bandColor(d.score), borderRadius: [0,5,5,0] } })),
+      label: { show: true, position: 'right', color: SLATE, fontFamily: MONO, fontWeight: 600, fontSize: 13, distance: 8, formatter: '{c}' },
+      barWidth: '56%',
+      markLine: {
+        silent: true, symbol: 'none',
+        lineStyle: { color: GRAY500, type: 'dotted', width: 1 },
+        label: { formatter: 'mean 6.5', color: GRAY500, fontFamily: MONO, fontSize: 10, position: 'end' },
+        data: [{ xAxis: 6.5 }],
+      },
+    }]
+  });
+
+  window.addEventListener('resize', () => { scores.resize(); });
+
+  const io = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); io.unobserve(entry.target); }
+    }
+  }, { threshold: 0.08 });
+  document.querySelectorAll('section').forEach((section) => io.observe(section));
+</script>
+</body>
+</html>

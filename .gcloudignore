@@ -1,0 +1,34 @@
+# .gcloudignore — controls what Cloud Build uploads as build context.
+# CRITICAL: do NOT exclude app/static/, qdrant_data/, bm25.json, or data/*.json —
+# they are baked into the image by COPY commands in the Dockerfile.
+
+.git
+.venv
+
+# Python caches
+**/__pycache__
+.pytest_cache
+.ruff_cache
+
+# Frontend source (build already in app/static/ — no need to upload)
+frontend/
+
+# Test + dev artefacts
+tests/
+eval/
+docs/
+lore/
+html-output/
+scripts/
+
+# Secrets / credentials — NEVER in image
+gg-gcpsbprojs-*.json
+*service-account*.json
+.env
+.env.*
+
+# Large PDFs — not needed in image (app reads cached HTML/JSON)
+data/corpus/*.pdf
+
+# Contextual cache (large, not needed at runtime)
+data/contextual_cache/

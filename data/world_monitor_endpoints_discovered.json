@@ -1,0 +1,141 @@
+{
+  "base": "https://finance.worldmonitor.app",
+  "probed_at": 1779756797.1213632,
+  "results": [
+    {
+      "label": "version",
+      "path": "/api/version",
+      "needs_key": false,
+      "status": 200,
+      "ms": 550,
+      "shape": {
+        "json": true,
+        "type": "object",
+        "top_keys": [
+          "prerelease",
+          "tag",
+          "url",
+          "version"
+        ]
+      },
+      "live_usable": true
+    },
+    {
+      "label": "stock_index",
+      "path": "/api/stock-index?symbols=^OMX,^GSPC,^GDAXI",
+      "needs_key": false,
+      "status": 404,
+      "ms": 40,
+      "shape": {
+        "json": true,
+        "type": "object",
+        "top_keys": [
+          "error"
+        ]
+      },
+      "live_usable": false
+    },
+    {
+      "label": "yahoo_finance",
+      "path": "/api/yahoo-finance?symbol=^OMX",
+      "needs_key": false,
+      "status": 404,
+      "ms": 34,
+      "shape": {
+        "json": true,
+        "type": "object",
+        "top_keys": [
+          "error"
+        ]
+      },
+      "live_usable": false
+    },
+    {
+      "label": "polymarket",
+      "path": "/api/polymarket?limit=10&active=true",
+      "needs_key": false,
+      "status": 401,
+      "ms": 2657,
+      "shape": {
+        "json": true,
+        "type": "object",
+        "top_keys": [
+          "error"
+        ]
+      },
+      "live_usable": false
+    },
+    {
+      "label": "risk_scores",
+      "path": "/api/risk-scores",
+      "needs_key": false,
+      "status": 404,
+      "ms": 38,
+      "shape": {
+        "json": true,
+        "type": "object",
+        "top_keys": [
+          "error"
+        ]
+      },
+      "live_usable": false
+    },
+    {
+      "label": "coingecko",
+      "path": "/api/coingecko",
+      "needs_key": false,
+      "status": 404,
+      "ms": 35,
+      "shape": {
+        "json": true,
+        "type": "object",
+        "top_keys": [
+          "error"
+        ]
+      },
+      "live_usable": false
+    },
+    {
+      "label": "macro_signals",
+      "path": "/api/macro-signals",
+      "needs_key": true,
+      "status": 404,
+      "ms": 46,
+      "shape": {
+        "json": true,
+        "type": "object",
+        "top_keys": [
+          "error"
+        ]
+      },
+      "live_usable": false
+    },
+    {
+      "label": "fred_data",
+      "path": "/api/fred-data?series_id=DGS10",
+      "needs_key": true,
+      "status": 404,
+      "ms": 34,
+      "shape": {
+        "json": true,
+        "type": "object",
+        "top_keys": [
+          "error"
+        ]
+      },
+      "live_usable": false
+    },
+    {
+      "label": "story_se",
+      "path": "/api/story?country=SE",
+      "needs_key": false,
+      "status": 200,
+      "ms": 580,
+      "shape": {
+        "json": false,
+        "preview": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, viewport-fit=co"
+      },
+      "live_usable": false
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "client_id": "bergstrom",
+  "generated_at": "2026-05-26T06:26:38.151163Z",
+  "intel_mode": "snapshot",
+  "opportunities": [
+    {
+      "trigger_type": "drift",
+      "asset_class": "US tech",
+      "magnitude": 5.0,
+      "confidence": "high",
+      "suggested_topic": "Review current overweight in US tech, which is 5% above the target allocation.",
+      "evidence_refs": [
+        {
+          "doc_id": "bergstrom_portfolio_q1_2026",
+          "chunk_id": null,
+          "source_uri": null,
+          "excerpt": null
+        },
+        {
+          "doc_id": "bergstrom_ips",
+          "chunk_id": null,
+          "source_uri": null,
+          "excerpt": null
+        }
+      ]
+    },
+    {
+      "trigger_type": "drift",
+      "asset_class": "Gulf real estate",
+      "magnitude": 5.0,
+      "confidence": "high",
+      "suggested_topic": "Address the significant overweight in Gulf real estate, currently 5% above its target allocation.",
+      "evidence_refs": [
+        {
+          "doc_id": "bergstrom_portfolio_q1_2026",
+          "chunk_id": null,
+          "source_uri": null,
+          "excerpt": null
+        },
+        {
+          "doc_id": "bergstrom_ips",
+          "chunk_id": null,
+          "source_uri": null,
+          "excerpt": null
+        }
+      ]
+    },
+    {
+      "trigger_type": "ips_violation",
+      "asset_class": "Multi-Asset",
+      "magnitude": -25.0,
+      "confidence": "high",
+      "suggested_topic": "Critical breach of the IPS FX policy: SEK base currency exposure is at 35.0%, significantly below the 60% minimum floor.",
+      "evidence_refs": [
+        {
+          "doc_id": "bergstrom_ips",
+          "chunk_id": null,
+          "source_uri": null,
+          "excerpt": null
+        },
+        {
+          "doc_id": "bergstrom_portfolio_q1_2026",
+          "chunk_id": null,
+          "source_uri": null,
+          "excerpt": null
+        }
+      ]
+    }
+  ],
+  "weekend_changes": [
+    {
+      "headline": "War puts brakes on UAE realty boom as Dubai projects face delays.",
+      "source_uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHzA_HeWoYVgBZB4ENYYI7zsjRP5CEHOr5JUJyz8FAxIMljTSpiz_8hRPbmIYrLLI1asLDkSScKtc4hOSHpeL70lTt-F2kFSFUSmGzWXH9BtxA79jrstutuSNE9_gGQCJKZBi4s9S6UU3U_Y3Bg1tO3VAC9Lw_KzCfl15rOG6yZxEIFDqFsMfJOHnhEKDodPkNEYfpf5dUQXomh652acVJ7K_lCy-kzb7jKKAywFOPqtUoOq-14QReS2-lllCk=",
+      "ts": "2026-05-26T00:00:00Z",
+      "relevance_tag": "gulf_real_estate"
+    },
+    {
+      "headline": "Saudi property market posts strong Q1 growth with $30 billion in deals.",
+      "source_uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGVlxR80S8mg5wITjPADGsWu2iqLm749SJ18Y3q5WxaX94TLcNe2uJZGuX5E4KyzsLIMfvJKloN8WLyrSkclKS6OPiwYk834ioDhNTiy33-aa5LbW7mLtCgzXYB9PByXkSqETXIshvBlE2PFMxpBA4J4QKpGKGkQzkMxYoZznW3Yn5jiaglamwC_0nKha2yiM0ehW3l7e4XYQVNw5bjQGlmAU-wTg38eFYxA7o=",
+      "ts": "2026-05-26T00:00:00Z",
+      "relevance_tag": "gulf_real_estate"
+    },
+    {
+      "headline": "EU Green Bond Standard: 2026 Regulation, Timeline & FAQ.",
+      "source_uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH6eW9S29ZvWuRhjlzhLeAH5lvajS1i4ujjXKsacVbF7RHEm1qkqCMLbDBPZvqTi49F9CcGb3tKc1_MRy7DVpGmk15dpjwkR_rQdLL73f6sMLF8dOymuy37B3Z-kiMhTwb6hEeXc3N1vq89gi6gN7e6swKn31J2aIhtLgB37hhUzqorQDBxlKrLBmqAALz0sUhdzW5D66U=",
+      "ts": "2026-05-26T00:00:00Z",
+      "relevance_tag": "green_bonds"
+    }
+  ],
+  "three_nbas": [
+    {
+      "title": "Fix Critical SEK FX Floor Breach (35% vs 60% Min)",
+      "rationale": "The portfolio is in critical breach of its Investment Policy Statement, with SEK base currency exposure at 35% against a mandatory 60% minimum. This represents a significant unhedged currency risk. This action is the highest priority for immediate IPS compliance.",
+      "projected_impact": "Realigns the portfolio with its core risk parameter, significantly reduces currency risk, and brings the portfolio back into compliance with the IPS FX floor.",
+      "confidence": "high",
+      "evidence_refs": [
+        {
+          "doc_id": "bergstrom_ips",
+          "chunk_id": null,
+          "source_uri": null,
+          "excerpt": "FX policy: a minimum of 60% SEK base-currency exposure across the total book."
+        },
+        {
+          "doc_id": "bergstrom_portfolio_q1_2026",
+          "chunk_id": null,
+          "source_uri": null,
+          "excerpt": null
+        }
+      ],
+      "computation_trace": "SEK base share = Σ(mv where fx_exposure='SEK') / AUM = SEK 168,000,000 / SEK 480,000,000 = 35.00% (floor=60% → BREACH)",
+      "suggested_priority": "primary"
+    },
+    {
+      "title": "Trim Overweights in US Tech, Gulf RE & Breached Single Stocks",
+      "rationale": "The portfolio has two 5pp overweights (US Tech at 20%, Gulf RE at 15%) and seven single-position breaches of the 5% AUM limit (e.g., Emirates REIT at 8.33%, Investor AB at 7.50%). Trimming these positions is required for IPS compliance, aligns with the client's stated concerns about valuations and concentration, and generates capital to fix the SEK FX breach.",
+      "projected_impact": "Reduces concentration risk, realigns the portfolio with IPS targets, and generates capital for rebalancing into underweight positions and increasing SEK exposure.",
+      "confidence": "high",
+      "evidence_refs": [
+        {
+          "doc_id": "bergstrom_ips",
+          "chunk_id": null,
+          "source_uri": null,
+          "excerpt": "Single-position limit: 5% of total AUM in any single security... target_allocation: US tech=15.0%, Gulf real estate=10.0%"
+        },
+        {
+          "doc_id": "bergstrom_portfolio_q1_2026",
+          "chunk_id": null,
+          "source_uri": null,
+          "excerpt": null
+        }
+      ],
+      "computation_trace": "Drift: Gulf real estate = 15.0% − 10.0% = +5.00pp; US tech = 20.0% − 15.0% = +5.00pp. Single-position breaches: Emirates REIT (8.33%), Investor AB (7.50%), Jabal Omar (6.67%), etc.",
+      "suggested_priority": "secondary"
+    },
+    {
+      "title": "Reallocate Capital to Green Bonds in EU Fixed Income Sleeve",
+      "rationale": "Directly addresses the client's request to increase allocation to green bonds. The EU Fixed Income sleeve is currently 5pp underweight target. Capital generated from trimming overweights can be reallocated here, improving the portfolio's ESG profile while closing an allocation gap. News on the new EU Green Bond Standard makes this a timely conversation.",
+      "projected_impact": "Fulfills a specific client objective, reduces the portfolio's allocation drift, and improves its ESG characteristics by funding a targeted, high-quality asset class.",
+      "confidence": "high",
+      "evidence_refs": [
+        {
+          "doc_id": "bergstrom_ips",
+          "chunk_id": null,
+          "source_uri": null,
+          "excerpt": "target_allocation: EU fixed income=20.0%"
+        },
+        {
+          "doc_id": "bergstrom_portfolio_q1_2026",
+          "chunk_id": null,
+          "source_uri": null,
+          "excerpt": null
+        },
+        {
+          "doc_id": "news_2026-05-26_EU-Green-Bond-Standard",
+          "chunk_id": null,
+          "source_uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH6eW9S29ZvWuRhjlzhLeAH5lvajS1i4ujjXKsacVbF7RHEm1qkqCMLbDBPZvqTi49F9CcGb3tKc1_MRy7DVpGmk15dpjwkR_rQdLL73f6sMLF8dOymuy37B3Z-kiMhTwb6hEeXc3N1vq89gi6gN7e6swKn31J2aIhtLgB37hhUzqorQDBxlKrLBmqAALz0sUhdzW5D66U=",
+          "excerpt": null
+        }
+      ],
+      "computation_trace": "Drift: EU fixed income = 15.0% − 20.0% = -5.00pp",
+      "suggested_priority": "tertiary"
+    }
+  ],
+  "risk_flags": [
+    {
+      "kind": "fx",
+      "severity": "action",
+      "note": "Critical breach of IPS. Portfolio SEK exposure is 35%, far below the required 60% minimum. Immediate action is required to rebalance and/or hedge."
+    },
+    {
+      "kind": "concentration",
+      "severity": "action",
+      "note": "Seven single-name positions are in breach of the 5% AUM limit. Most severe are Emirates REIT (8.33%), Investor AB (7.50%), and Jabal Omar Dev Co. (6.67%). Trimming is required."
+    }
+  ]
+}
