@@ -39,7 +39,7 @@ FLEET: dict[str, dict[str, str]] = {
     },
     "macro": {
         "emoji": "🌍", "name": "Macro Strategist", "stage": "Stage 3 · parallel",
-        "role": "Macro backdrop from BIS / ECB / IMF corpus via hybrid retrieval",
+        "role": "Macro backdrop from the BIS / ECB / IMF document library via hybrid retrieval",
     },
     "portfolio": {
         "emoji": "📊", "name": "Portfolio Analyst", "stage": "Stage 3 · parallel",
@@ -55,7 +55,7 @@ FLEET: dict[str, dict[str, str]] = {
     },
     "chat": {
         "emoji": "💬", "name": "Advisor Q&A", "stage": "On demand",
-        "role": "Hybrid-retrieval chat over the brief, book and corpus (AFC + ReAct)",
+        "role": "Hybrid-retrieval chat over the brief, book and document library (AFC + ReAct)",
     },
 }
 
