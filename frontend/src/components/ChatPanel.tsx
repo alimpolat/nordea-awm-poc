@@ -16,7 +16,7 @@
 import { useState, useRef, useEffect } from "react";
 import type { KeyboardEvent } from "react";
 import { postChat } from "../api";
-import type { EvidenceRef, ChatResponse, Confidence } from "../types";
+import type { BriefSchema, EvidenceRef, ChatResponse, Confidence } from "../types";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -37,15 +37,50 @@ type Message = UserMessage | AssistantMessage;
 interface Props {
   clientId: string;
   onCite: (refs: EvidenceRef[]) => void;
+  /** today's brief — suggestions are derived from its real content */
+  brief?: BriefSchema | null;
 }
 
 // ── Suggested prompts ─────────────────────────────────────────────────────────
 
-const SUGGESTED_PROMPTS = [
-  "What if Brent drops to $60?",
-  "Any Gulf real estate news worth raising?",
-  "What's our ECB-rate exposure?",
+const FALLBACK_PROMPTS = [
+  "What should I raise with the family today?",
+  "Any market moves affecting our book?",
+  "Where are we outside IPS limits?",
 ];
+
+function trunc(s: string, n = 48): string {
+  return s.length > n ? s.slice(0, n).replace(/\s+\S*$/, "") + "…" : s;
+}
+
+/** Build suggestion chips from the brief's REAL content (NBA, news, risk flag). */
+function suggestedPrompts(brief?: BriefSchema | null): string[] {
+  if (!brief) return FALLBACK_PROMPTS;
+  const out: string[] = [];
+
+  const nba = brief.three_nbas?.[0];
+  if (nba?.title) out.push(`Why is "${trunc(nba.title, 44)}" first?`);
+
+  const news = brief.weekend_changes?.find(
+    (w): w is Extract<typeof w, { headline: string }> =>
+      "headline" in w && !!(w as { headline?: string }).headline,
+  );
+  if (news) out.push(`What does "${trunc(news.headline, 44)}" mean for us?`);
+
+  const flag = brief.risk_flags?.find((f) => f.severity === "action") ?? brief.risk_flags?.[0];
+  if (flag && flag.kind !== "none") {
+    const kindLabel: Record<string, string> = {
+      concentration: "single-name concentration",
+      fx: "FX floor breach",
+      regulatory: "regulatory flag",
+      liquidity: "liquidity floor",
+    };
+    out.push(`How do we fix the ${kindLabel[flag.kind] ?? flag.kind}?`);
+  }
+
+  while (out.length < 3) out.push(FALLBACK_PROMPTS[out.length]);
+  return out.slice(0, 3);
+}
 
 // ── Confidence badge ──────────────────────────────────────────────────────────
 
@@ -173,7 +208,8 @@ function ThinkingBubble() {
 
 // ── Main ChatPanel ────────────────────────────────────────────────────────────
 
-export default function ChatPanel({ clientId, onCite }: Props) {
+export default function ChatPanel({ clientId, onCite, brief }: Props) {
+  const prompts = suggestedPrompts(brief);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
@@ -246,7 +282,7 @@ export default function ChatPanel({ clientId, onCite }: Props) {
             <p className="font-mono text-[9px] uppercase tracking-widest text-gray-400">
               Try asking
             </p>
-            {SUGGESTED_PROMPTS.map((prompt) => (
+            {prompts.map((prompt) => (
               <button
                 key={prompt}
                 onClick={() => sendMessage(prompt)}

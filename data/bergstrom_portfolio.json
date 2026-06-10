@@ -6,7 +6,7 @@
   "base_currency": "SEK",
   "aum_sek": 479857590,
   "as_of": "2026-06-10",
-  "last_meeting_date": "2026-04-14",
+  "last_meeting_date": "2026-05-26",
   "single_position_limit_pct": 5.0,
   "fx_floor_pct": 60.0,
   "fx_policy": "Minimum 60% SEK base-currency exposure across the total book.",

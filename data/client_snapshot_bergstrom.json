@@ -199,17 +199,21 @@
     "Alternatives": 0.2
   },
   "stated_concerns": [
-    "Gulf concentration creeping above target. The family is 'comfortable with the assets but not with the size,' and wants to understand the regional macro backdrop (oil, Gulf rates) before trimming.",
-    "US-tech valuation discomfort. The principals are 'uneasy about paying these multiples' and open to a partial trim, but want it framed against the macro/rates picture rather than sold reflexively.",
-    "Interest in green-bond reallocation. The family wants the European fixed-income sleeve rebuilt toward green bonds, funded from trimming the overweight sleeves."
+    "FX floor breach – now the priority.",
+    "Hexagon drawdown and single-name sizing, checking if larger Nordic single names have grown past the 5% single-position limit.",
+    "Gulf softness supports the trim, 'better to lighten while the assets are still well bid'.",
+    "Green bonds – move while rates fall, wanting reallocation executed, not studied.",
+    "Gulf concentration creeping above target; 'comfortable with the assets but not with the size'.",
+    "US-tech valuation discomfort; 'uneasy about paying these multiples'."
   ],
   "restrictions": [
     "No direct fossil-fuel producers.",
     "No direct holdings in upstream oil, gas, or coal extraction companies.",
+    "ESG-screened equity.",
     "Single-name equity must pass Nordea's ESG screen (no controversial weapons, no UN Global Compact violators).",
-    "Single-position limit: 5% of total AUM in any single security (funds and broad ETFs exempt).",
-    "FX policy: a minimum of 60% SEK base-currency exposure across the total book.",
-    "Liquidity floor: ≥5% in instruments realisable within five business days."
+    "Single position limit: 5% of total AUM in any single security.",
+    "FX base-currency exposure must be a minimum of 60% SEK.",
+    "At least 5% of AUM must be in instruments realisable within five business days."
   ],
-  "last_meeting_date": "2026-04-14"
+  "last_meeting_date": "2026-05-26"
 }

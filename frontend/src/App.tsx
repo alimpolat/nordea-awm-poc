@@ -119,7 +119,7 @@ function Cockpit({
 
         {/* Right column — 30% */}
         <div className="w-80 xl:w-96 flex-shrink-0">
-          <ChatPanel clientId={CLIENT_ID} onCite={setCiteRefs} />
+          <ChatPanel clientId={CLIENT_ID} onCite={setCiteRefs} brief={brief} />
         </div>
       </div>
 
