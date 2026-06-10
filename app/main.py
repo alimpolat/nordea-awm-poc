@@ -155,6 +155,68 @@ async def get_client(client_id: str):
 
 
 # ---------------------------------------------------------------------------
+# Per-holding price trends (real, live) — feeds the holdings-table sparklines
+# ---------------------------------------------------------------------------
+
+# Some holdings carry a portfolio code that is not the tradable Yahoo symbol.
+_TICKER_OVERRIDES: dict[str, str] = {
+    "IEAC": "IEAC.AS",  # iShares EUR Corp Bond UCITS — Amsterdam listing
+}
+# Codes with no equity price series (bond yields, illiquid private funds, or
+# venues Yahoo doesn't cover): served as source="unavailable" → FE draws an
+# indicative line, honestly labelled.
+_NO_MARKET_PRICE = {"DE10Y-BUND", "FR10Y-OAT", "REIT.DI", "NORD-PE-VII", "GLOB-INFRA"}
+
+_TRENDS_CACHE: dict[str, tuple[float, dict]] = {}  # client_id -> (monotonic_ts, payload)
+_TRENDS_TTL_S = 900  # 15 min
+
+
+@app.get("/api/trends/{client_id}")
+async def get_trends(client_id: str):
+    """Real 30-day daily-close trend per holding (free Yahoo feed), cached 15 min.
+
+    Returns {ticker: {"closes": [...], "source": "live"|"unavailable"}}. Liquid
+    positions get real price history; bonds and illiquid funds report
+    "unavailable" so the frontend can mark them honestly.
+    """
+    import time
+    from concurrent.futures import ThreadPoolExecutor
+
+    from app.intel.live_market import price_history
+
+    cached = _TRENDS_CACHE.get(client_id)
+    if cached and (time.monotonic() - cached[0]) < _TRENDS_TTL_S:
+        return cached[1]
+
+    portfolio_path = BRIEF_CACHE_PATH.parent / f"{client_id}_portfolio.json"
+    if not portfolio_path.exists():
+        raise HTTPException(status_code=404, detail=f"No portfolio for '{client_id}'.")
+    import json
+
+    holdings = json.loads(portfolio_path.read_text(encoding="utf-8")).get("holdings", [])
+    tickers = [h["ticker"] for h in holdings if h.get("ticker")]
+
+    def fetch(ticker: str) -> tuple[str, dict]:
+        if ticker in _NO_MARKET_PRICE:
+            return ticker, {"closes": [], "source": "unavailable"}
+        series = price_history(_TICKER_OVERRIDES.get(ticker, ticker))
+        if series:
+            return ticker, {"closes": series, "source": "live"}
+        return ticker, {"closes": [], "source": "unavailable"}
+
+    loop = asyncio.get_event_loop()
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        results = await asyncio.gather(
+            *[loop.run_in_executor(pool, fetch, t) for t in tickers]
+        )
+    payload = {t: data for t, data in results}
+    _TRENDS_CACHE[client_id] = (time.monotonic(), payload)
+    live_n = sum(1 for d in payload.values() if d["source"] == "live")
+    logger.info("trends/%s: %d live, %d unavailable", client_id, live_n, len(payload) - live_n)
+    return payload
+
+
+# ---------------------------------------------------------------------------
 # Chat
 # ---------------------------------------------------------------------------
 

@@ -5,7 +5,9 @@
  * Current allocation is computed from holdings:
  *   current[asset_class] = sum(current_mv for that class) / aum_sek
  */
+import { useEffect, useState } from "react";
 import type { ClientSnapshot, BriefSchema } from "../types";
+import { getTrends, type TrendsMap } from "../api";
 import AllocationDonut from "../charts/AllocationDonut";
 import Sparkline from "../charts/Sparkline";
 
@@ -61,6 +63,19 @@ function computeCurrentAlloc(
 
 export default function ClientHeader({ client, brief }: Props) {
   const currentAlloc = computeCurrentAlloc(client.holdings, client.aum_sek);
+
+  // Real per-holding 30-day price trends (live feed). Falls back to an
+  // indicative line per holding that has no market price (bonds, illiquid funds).
+  const [trends, setTrends] = useState<TrendsMap>({});
+  useEffect(() => {
+    let alive = true;
+    getTrends(client.client_id)
+      .then((t) => alive && setTrends(t))
+      .catch(() => {}); // fall back to indicative shapes on any failure
+    return () => {
+      alive = false;
+    };
+  }, [client.client_id]);
 
   // Format generated_at
   const genAt = new Date(brief.generated_at);
@@ -136,7 +151,7 @@ export default function ClientHeader({ client, brief }: Props) {
             Allocation
           </p>
           <p className="font-mono text-[10px] text-gray-500 px-2 mb-1">
-            inner ring = target · outer = current
+            current allocation · drift vs IPS target
           </p>
           <AllocationDonut
             target={client.target_allocation}
@@ -167,8 +182,14 @@ export default function ClientHeader({ client, brief }: Props) {
             </thead>
             <tbody>
               {client.holdings.map((h, i) => {
-                const isPositive = h.ytd_return_pct >= 0;
-                const spark = sparkSeries(h.ytd_return_pct, i * 3.7);
+                const series = trends[h.ticker];
+                const live = series?.source === "live" && series.closes.length > 1;
+                const spark = live
+                  ? series!.closes
+                  : sparkSeries(h.ytd_return_pct, i * 3.7);
+                const isPositive = live
+                  ? spark[spark.length - 1] >= spark[0]
+                  : h.ytd_return_pct >= 0;
                 return (
                   <tr
                     key={h.ticker}
@@ -203,6 +224,7 @@ export default function ClientHeader({ client, brief }: Props) {
                       <Sparkline
                         data={spark}
                         positive={isPositive}
+                        indicative={!live}
                         width={80}
                         height={24}
                       />

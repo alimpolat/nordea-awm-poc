@@ -73,6 +73,23 @@ def _unwrap_json_answer(text: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Refusal detection (used to trigger the manual ReAct fallback)
+# ---------------------------------------------------------------------------
+
+_REFUSAL_PHRASES = (
+    "i don't know", "i cannot", "cannot find", "don't have enough",
+    "unable to", "internal error", "issue with the available tools",
+    "error in accessing", "error with the available tools", "unable to find",
+    "i apologize", "i'm sorry",
+)
+
+
+def _is_refusal(text: str) -> bool:
+    t = (text or "").lower()
+    return any(p in t for p in _REFUSAL_PHRASES)
+
+
+# ---------------------------------------------------------------------------
 # Synchronous core
 # ---------------------------------------------------------------------------
 
@@ -230,12 +247,19 @@ def _run_sync(req: ChatRequest) -> ChatResponse:
             logger.warning("web_grounding: error: %s", exc)
             return "(web search unavailable)"
 
+    tool_map = {
+        "retrieve_from_corpus": retrieve_from_corpus,
+        "retrieve_from_brief": retrieve_from_brief,
+        "lookup_client_holdings": lookup_client_holdings,
+        "web_grounding": web_grounding,
+    }
+
     # ── Try AFC (Automatic Function Calling) ────────────────────────────────
     answer = ""
     try:
         cfg = types.GenerateContentConfig(
             system_instruction=load_prompt("chat"),
-            tools=[retrieve_from_corpus, retrieve_from_brief, lookup_client_holdings, web_grounding],
+            tools=list(tool_map.values()),
             automatic_function_calling=types.AutomaticFunctionCallingConfig(
                 maximum_remote_calls=_MAX_TOOL_CALLS,
             ),
@@ -254,16 +278,15 @@ def _run_sync(req: ChatRequest) -> ChatResponse:
             type(exc).__name__,
             exc,
         )
-        # ── Manual ReAct fallback ────────────────────────────────────────────
-        answer = _manual_react(
-            question=req.question,
-            tool_map={
-                "retrieve_from_corpus": retrieve_from_corpus,
-                "retrieve_from_brief": retrieve_from_brief,
-                "lookup_client_holdings": lookup_client_holdings,
-                "web_grounding": web_grounding,
-            },
-        )
+        answer = _manual_react(question=req.question, tool_map=tool_map)
+
+    # ── AFC sometimes "completes" without actually grounding (tool execution
+    #    under a worker thread can silently no-op). If we got no evidence refs
+    #    and the answer reads like a refusal, retry via the explicit manual
+    #    ReAct loop, which invokes the tool functions directly. ───────────────
+    if not refs and (not answer.strip() or _is_refusal(answer)):
+        logger.info("chat: AFC produced no grounded refs (answer=%.40r) — retrying manual ReAct", answer)
+        answer = _manual_react(question=req.question, tool_map=tool_map)
 
     # ── Build response ───────────────────────────────────────────────────────
     if not answer or answer.strip() == "":

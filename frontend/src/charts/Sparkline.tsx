@@ -4,17 +4,25 @@
  * Line colour: olive if positive trend, rust if negative.
  */
 import ReactECharts from "echarts-for-react";
-import { houseChartBase, OLIVE, RUST } from "./theme";
+import { houseChartBase, OLIVE, RUST, GRAY_500 } from "./theme";
 
 interface Props {
   data: number[];
   positive?: boolean;
+  /** true = no real market price (bond / illiquid fund) → muted dashed indicative line */
+  indicative?: boolean;
   width?: number;
   height?: number;
 }
 
-export default function Sparkline({ data, positive = true, width = 90, height = 28 }: Props) {
-  const lineColor = positive ? OLIVE : RUST;
+export default function Sparkline({
+  data,
+  positive = true,
+  indicative = false,
+  width = 90,
+  height = 28,
+}: Props) {
+  const lineColor = indicative ? GRAY_500 : positive ? OLIVE : RUST;
 
   const option = {
     ...houseChartBase,
@@ -38,17 +46,25 @@ export default function Sparkline({ data, positive = true, width = 90, height = 
         data,
         smooth: true,
         symbol: "none",
-        lineStyle: { color: lineColor, width: 1.5 },
-        areaStyle: {
-          color: {
-            type: "linear" as const,
-            x: 0, y: 0, x2: 0, y2: 1,
-            colorStops: [
-              { offset: 0, color: `${lineColor}40` },
-              { offset: 1, color: `${lineColor}00` },
-            ],
-          },
+        lineStyle: {
+          color: lineColor,
+          width: indicative ? 1 : 1.5,
+          type: indicative ? ("dashed" as const) : ("solid" as const),
+          opacity: indicative ? 0.6 : 1,
         },
+        // No area fill for indicative lines — signals "not real price history".
+        areaStyle: indicative
+          ? undefined
+          : {
+              color: {
+                type: "linear" as const,
+                x: 0, y: 0, x2: 0, y2: 1,
+                colorStops: [
+                  { offset: 0, color: `${lineColor}40` },
+                  { offset: 1, color: `${lineColor}00` },
+                ],
+              },
+            },
         itemStyle: { color: lineColor },
       },
     ],

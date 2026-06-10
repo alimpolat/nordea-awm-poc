@@ -11,6 +11,7 @@ from datetime import datetime
 
 import httpx
 
+from app.intel import live_market
 from app.intel.snapshot_loader import SNAPSHOT, SNAPSHOT_AS_OF
 from app.schemas import IntelFinding, IntelFindings
 from app.settings import settings
@@ -29,6 +30,22 @@ def _from_snapshot(key: str, blk: dict) -> IntelFinding:
         as_of=_AS_OF,
         relevance=blk["relevance"],
         live_or_snapshot="snapshot",
+    )
+
+
+def _from_live_market(key: str, blk: dict) -> IntelFinding | None:
+    """Real free-feed live value for a signal (Yahoo Finance). None if unsupported/failed."""
+    res = live_market.live_value(key)
+    if res is None:
+        return None
+    value, source_label, change_note = res
+    return IntelFinding(
+        source=source_label,
+        metric=blk["metric"],
+        value=value,
+        as_of=datetime.now().astimezone(),
+        relevance=blk["relevance"] + change_note,
+        live_or_snapshot="live",
     )
 
 
@@ -62,8 +79,11 @@ def fetch_intel() -> IntelFindings:
     items: list[IntelFinding] = []
     for key, blk in SNAPSHOT.items():
         finding: IntelFinding | None = None
-        if mode in ("auto", "live") and key in LIVE_ROUTES:
-            finding = _try_live(key, LIVE_ROUTES[key])
+        if mode in ("auto", "live"):
+            # 1) real free market feeds (Yahoo Finance); 2) any World_Monitor route
+            finding = _from_live_market(key, blk)
+            if finding is None and key in LIVE_ROUTES:
+                finding = _try_live(key, LIVE_ROUTES[key])
         if finding is None:
             finding = _from_snapshot(key, blk)
         items.append(finding)

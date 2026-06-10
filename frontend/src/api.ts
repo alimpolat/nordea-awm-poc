@@ -56,6 +56,17 @@ export function postHitl(
   });
 }
 
+export interface TrendSeries {
+  closes: number[];
+  source: "live" | "unavailable";
+}
+export type TrendsMap = Record<string, TrendSeries>;
+
+/** Real per-holding 30-day close trends (free live feed, cached server-side). */
+export function getTrends(clientId: string): Promise<TrendsMap> {
+  return apiFetch<TrendsMap>(`/api/trends/${clientId}`);
+}
+
 export function postChat(req: ChatRequest): Promise<ChatResponse> {
   return apiFetch<ChatResponse>("/api/chat", {
     method: "POST",
