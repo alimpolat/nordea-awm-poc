@@ -154,12 +154,52 @@ export default function WeekendChangesPanel({ changes, onCite }: Props) {
           )}
         </div>
 
-        {/* Macro radar */}
+        {/* Macro radar (needs ≥3 axes to be readable) or signal-strength list */}
         <div>
           <p className="font-mono text-[10px] uppercase tracking-widest text-gray-500 mb-1">
-            Signal radar
+            {indicators.length >= 3 ? "Signal radar" : "Signal strength"}
           </p>
-          <MacroRadar indicators={indicators} values={values} height={260} />
+          {indicators.length >= 3 ? (
+            <MacroRadar indicators={indicators} values={values} height={260} />
+          ) : (
+            <div className="space-y-3 mt-2">
+              {changes.length === 0 && (
+                <p className="text-xs font-serif italic text-gray-500">
+                  No signals this run.
+                </p>
+              )}
+              {changes.slice(0, 5).map((c, i) => {
+                const label = isNewsItem(c) ? c.headline : c.claim;
+                const conf = isNewsItem(c) ? null : c.confidence;
+                const level = conf === "high" ? 3 : conf === "medium" ? 2 : conf ? 1 : 2;
+                const color =
+                  level === 3 ? "bg-olive" : level === 2 ? "bg-amber" : "bg-rust";
+                return (
+                  <div key={i}>
+                    <p className="font-serif text-[11.5px] text-slate leading-snug mb-1">
+                      {label.length > 70 ? label.slice(0, 70) + "…" : label}
+                    </p>
+                    <div className="flex items-center gap-1.5">
+                      {[1, 2, 3].map((seg) => (
+                        <span
+                          key={seg}
+                          className={`h-1.5 flex-1 rounded-full ${
+                            seg <= level ? color : "bg-gray-150"
+                          }`}
+                        />
+                      ))}
+                      <span className="font-mono text-[9px] uppercase tracking-wide text-gray-500 ml-1">
+                        {conf ? CONFIDENCE_LABELS[conf] : "news"}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+              <p className="font-mono text-[9px] text-gray-500 pt-1">
+                radar appears when ≥3 macro signals are present
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
