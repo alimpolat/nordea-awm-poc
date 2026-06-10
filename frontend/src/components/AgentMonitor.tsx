@@ -102,10 +102,19 @@ function AgentCard({ a }: { a: AgentStatus }) {
   );
 }
 
-export default function AgentMonitor({ clientId }: { clientId: string }) {
+export default function AgentMonitor({
+  clientId,
+  onPipelineComplete,
+}: {
+  clientId: string;
+  /** called when the fleet transitions running -> idle, so the page can
+   *  re-fetch the freshly generated brief (new headlines, NBAs, chips) */
+  onPipelineComplete?: () => void;
+}) {
   const [fleet, setFleet] = useState<FleetSnapshot | null>(null);
   const [regenerating, setRegenerating] = useState(false);
   const timer = useRef<number | null>(null);
+  const wasRunning = useRef(false);
 
   const poll = useCallback(async () => {
     try {
@@ -113,14 +122,19 @@ export default function AgentMonitor({ clientId }: { clientId: string }) {
       if (res.ok) {
         const snap: FleetSnapshot = await res.json();
         setFleet(snap);
-        if (!snap.pipeline_running) setRegenerating(false);
+        if (!snap.pipeline_running) {
+          setRegenerating(false);
+          // pipeline just finished -> surface the fresh brief automatically
+          if (wasRunning.current) onPipelineComplete?.();
+        }
+        wasRunning.current = snap.pipeline_running;
         return snap.pipeline_running;
       }
     } catch {
       /* backend briefly away — keep last snapshot */
     }
     return false;
-  }, []);
+  }, [onPipelineComplete]);
 
   useEffect(() => {
     let alive = true;

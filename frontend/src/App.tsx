@@ -74,9 +74,11 @@ function ErrorState({ message }: { message: string }) {
 function Cockpit({
   brief,
   client,
+  onRefresh,
 }: {
   brief: BriefSchema;
   client: ClientSnapshot;
+  onRefresh?: () => void;
 }) {
   const [citeRefs, setCiteRefs] = useState<EvidenceRef[] | null>(null);
 
@@ -116,7 +118,7 @@ function Cockpit({
 
           <RiskFlags flags={brief.risk_flags} />
           <FollowUpPanel />
-          <AgentMonitor clientId={CLIENT_ID} />
+          <AgentMonitor clientId={CLIENT_ID} onPipelineComplete={onRefresh} />
         </div>
 
         {/* Right column — 30% */}
@@ -147,20 +149,30 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (isChartsRoute) return;
-    setLoading(true);
-    setError(null);
-
+  // silent=true refreshes data in place (no skeleton flash) — used after a
+  // pipeline run completes so new headlines/NBAs/chips appear automatically.
+  const load = (silent = false) => {
+    if (!silent) {
+      setLoading(true);
+      setError(null);
+    }
     Promise.all([getBrief(CLIENT_ID), getClient(CLIENT_ID)])
       .then(([b, c]) => {
         setBrief(b);
         setClient(c);
       })
       .catch((e: Error) => {
-        setError(e.message);
+        if (!silent) setError(e.message);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!silent) setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    if (isChartsRoute) return;
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isChartsRoute]);
 
   if (isChartsRoute) return <ChartsDemo />;
@@ -192,7 +204,7 @@ export default function App() {
         {loading && <LoadingState />}
         {error && <ErrorState message={error} />}
         {!loading && !error && brief && client && (
-          <Cockpit brief={brief} client={client} />
+          <Cockpit brief={brief} client={client} onRefresh={() => load(true)} />
         )}
       </main>
     </div>
